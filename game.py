@@ -1,6 +1,6 @@
 import pygame
 import sys
-from const import OBJECT_SIZE, GAME_NAME, BLACK, RED, FONT_SIZE, FPS, OFFSET_X, OFFSET_Y, WIDTH, HEIGHT
+from const import OBJECT_SIZE, GAME_NAME, BLACK, RED, WHITE, FONT_SIZE_RED, FONT_SIZE_WHITE, FPS, OFFSET_X, OFFSET_Y, WIDTH, HEIGHT
 from wall_blocks import load_wall_image, generate_wall_blocks
 from blocks import load_block_image, create_blocks
 from key import load_key_image
@@ -11,14 +11,17 @@ from random_generator import (
 )
 from logic import handle_enemy_collisions
 
-def main():
+def main_game():
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption(GAME_NAME)
-    font = pygame.font.SysFont(None, FONT_SIZE)
+    font_red = pygame.font.SysFont(None, FONT_SIZE_RED)
+    font_white = pygame.font.SysFont(None, FONT_SIZE_WHITE)
     clock = pygame.time.Clock()
 
     game_over = False
+    stage_num = 0
+    start_time = pygame.time.get_ticks()
 
     while not game_over:
         # ===== ステージの初期化 =====
@@ -52,6 +55,8 @@ def main():
 
         stage_clear = False
 
+        stage_num += 1
+
         # ===== ステージ内ループ =====
         while not stage_clear and not game_over:
             clock.tick(FPS)
@@ -81,7 +86,7 @@ def main():
             # ゴールとの衝突
             goal_rect = pygame.Rect(goal_pos[0], goal_pos[1], OBJECT_SIZE, OBJECT_SIZE)
             if key_collected and player_rect.colliderect(goal_rect):
-                text = font.render("STAGE CLEAR!", True, RED)
+                text = font_red.render("STAGE CLEAR!", True, RED)
                 text_rect = text.get_rect(center=(WIDTH//2, HEIGHT//2))
                 stage_clear = True
 
@@ -89,7 +94,7 @@ def main():
             for enemy in enemies:
                 if player_rect.colliderect(enemy.rect):
                     player.set_failure()
-                    text = font.render("GAME OVER", True, RED)
+                    text = font_red.render("GAME OVER", True, RED)
                     text_rect = text.get_rect(center=(WIDTH//2, HEIGHT//2))
                     game_over = True
                     break
@@ -99,6 +104,21 @@ def main():
 
             for wall in wall_blocks:
                 screen.blit(wall_image, wall)
+
+            # --- ステージ数の表示（左上） ---
+            stage_text = font_white.render(f"{stage_num}F", True, WHITE)
+            screen.blit(stage_text, (10, 10))  # 左上余白10px
+
+            # --- 経過タイムの表示（右上） ---
+            elapsed_time = pygame.time.get_ticks() - start_time
+            minutes = elapsed_time // 60000
+            seconds = (elapsed_time % 60000) // 1000
+            milliseconds = elapsed_time % 1000
+            time_str = f"{minutes:02}:{seconds:02}.{milliseconds:03}"
+            time_text = font_white.render(time_str, True, WHITE)
+            time_rect = time_text.get_rect()
+            time_rect.topleft = (WIDTH - 200, 10)  # 180px程度の固定幅スペースを確保
+            screen.blit(time_text, time_rect)
 
             for pos in block_positions:
                 screen.blit(block_image, pos)
@@ -126,6 +146,3 @@ def main():
     # ゲーム全体終了処理
     pygame.quit()
     sys.exit()
-
-if __name__ == "__main__":
-    main()
