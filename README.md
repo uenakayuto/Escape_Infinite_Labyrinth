@@ -1,2 +1,2 @@
-# Escape-infinite-labyrinth
+# Escape_Infinite_Labyrinth
 植中雄斗とChatGPTの共同開発ゲーム
