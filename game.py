@@ -1,10 +1,13 @@
 import pygame
 import sys
-from const import OBJECT_SIZE, GAME_NAME, BLACK, RED, WHITE, FONT_SIZE_RED, FONT_SIZE_WHITE, FPS, OFFSET_X, OFFSET_Y, WIDTH, HEIGHT
+from const import OBJECT_SIZE, GAME_NAME, BLACK, RED, WHITE, FONT_SIZE_RED, FONT_SIZE_WHITE, FONT_SIZE_COUNTDOWN, FPS, OFFSET_X, OFFSET_Y, WIDTH, HEIGHT
+from database import init_db, save_game_result
 from wall_blocks import load_wall_image, generate_wall_blocks
 from blocks import load_block_image, create_blocks
 from key import load_key_image
 from goal import load_goal_images
+from fade import fade_in
+from countdown import countdown
 from random_generator import (
     generate_random_player, generate_random_blocks, generate_random_key,
     generate_random_goal, generate_random_enemies
@@ -12,11 +15,15 @@ from random_generator import (
 from logic import handle_enemy_collisions
 
 def main_game():
+    # データベースの初期化
+    init_db()
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption(GAME_NAME)
     font_red = pygame.font.SysFont(None, FONT_SIZE_RED)
     font_white = pygame.font.SysFont(None, FONT_SIZE_WHITE)
+    font_countdown = pygame.font.SysFont(None, FONT_SIZE_COUNTDOWN)
+    
     clock = pygame.time.Clock()
 
     game_over = False
@@ -56,6 +63,24 @@ def main_game():
         stage_clear = False
 
         stage_num += 1
+
+        if stage_num == 1:
+            def draw():
+                screen.fill(BLACK)
+
+                for wall in wall_blocks:
+                    screen.blit(wall_image, wall)
+                for pos in block_positions:
+                    screen.blit(block_image, pos)
+                screen.blit(key_image, key_pos)
+                screen.blit(goal_image, goal_pos)
+                for enemy in enemies:
+                    enemy.draw(screen)
+                player.draw(screen)
+
+            fade_in(screen, draw)
+
+            countdown(screen, font_countdown, draw)  # カウントダウンを表示
 
         # ===== ステージ内ループ =====
         while not stage_clear and not game_over:
@@ -140,9 +165,12 @@ def main_game():
 
             pygame.display.update()
 
-        # ステージ終了後 2秒待機
+        # ステージ終了後の処理
+        if not game_over:
+            clear_time = elapsed_time // 1000  # 秒単位
         pygame.time.wait(1000)
 
     # ゲーム全体終了処理
+    save_game_result(stage_num - 1, clear_time)
     pygame.quit()
     sys.exit()
