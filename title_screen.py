@@ -1,6 +1,6 @@
 import pygame
 import sys
-from const import WIDTH, HEIGHT, GAME_NAME, FONT_SIZE_TITLE, FONT_SIZE_MENU, WHITE, BLACK
+from const import WIDTH, HEIGHT, GAME_NAME, FONT_SIZE_GAME_TITLE, FONT_SIZE_MENU, WHITE, BLACK
 from util import resource_path
 
 def show_title_screen(screen):
@@ -8,7 +8,7 @@ def show_title_screen(screen):
     background_image = pygame.image.load(background_path).convert()
     background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
     # タイトルとメニューのフォント
-    title_font = pygame.font.SysFont(None, FONT_SIZE_TITLE)  # タイトル用（大きめ）
+    title_font = pygame.font.SysFont(None, FONT_SIZE_GAME_TITLE)  # タイトル用（大きめ）
     menu_font = pygame.font.SysFont(None, FONT_SIZE_MENU)   # メニュー用（小さめ）
 
     # メニュー項目（選択肢）
@@ -45,7 +45,10 @@ def show_title_screen(screen):
                 sys.exit()
 
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
+                if event.key == pygame.K_ESCAPE:  # Escキーが押された場合
+                    pygame.quit()
+                    sys.exit()
+                elif event.key == pygame.K_UP:
                     selected_index = (selected_index - 1) % len(menu_items)
                 elif event.key == pygame.K_DOWN:
                     selected_index = (selected_index + 1) % len(menu_items)

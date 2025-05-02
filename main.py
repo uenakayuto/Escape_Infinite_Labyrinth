@@ -3,6 +3,7 @@ from title_screen import show_title_screen
 from game import main_game
 from const import WIDTH, HEIGHT, GAME_NAME
 from fade import fade_out
+from records import show_records
 
 def main():
     pygame.init()
@@ -17,8 +18,9 @@ def main():
             main_game()  # 本編を開始
         # elif selected == 1:
         #     show_how_to_play(screen)  # 未実装ならスキップしてOK
-        # elif selected == 2:
-        #     show_records(screen)      # 未実装ならスキップしてOK
+        elif selected == 2:
+            fade_out(screen)
+            show_records(screen)
 
 if __name__ == "__main__":
     main()

@@ -1,18 +1,19 @@
 import pygame
 import sys
-from const import OBJECT_SIZE, GAME_NAME, BLACK, RED, WHITE, FONT_SIZE_RED, FONT_SIZE_WHITE, FONT_SIZE_COUNTDOWN, FPS, OFFSET_X, OFFSET_Y, WIDTH, HEIGHT
+from const import OBJECT_SIZE, GAME_NAME, BLACK, RED, WHITE, FONT_SIZE_RED, FONT_SIZE_FLOOR_TIME, FONT_SIZE_COUNTDOWN, FPS, OFFSET_X, OFFSET_Y, WIDTH, HEIGHT
 from database import init_db, save_game_result
 from wall_blocks import load_wall_image, generate_wall_blocks
 from blocks import load_block_image, create_blocks
 from key import load_key_image
 from goal import load_goal_images
-from fade import fade_in
+from fade import fade_in, fade_out
 from countdown import countdown
 from random_generator import (
     generate_random_player, generate_random_blocks, generate_random_key,
     generate_random_goal, generate_random_enemies
 )
 from logic import handle_enemy_collisions
+from result_screen import show_result_screen
 
 def main_game():
     # データベースの初期化
@@ -21,7 +22,7 @@ def main_game():
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption(GAME_NAME)
     font_red = pygame.font.SysFont(None, FONT_SIZE_RED)
-    font_white = pygame.font.SysFont(None, FONT_SIZE_WHITE)
+    font_white = pygame.font.SysFont(None, FONT_SIZE_FLOOR_TIME)
     font_countdown = pygame.font.SysFont(None, FONT_SIZE_COUNTDOWN)
     
     clock = pygame.time.Clock()
@@ -167,10 +168,25 @@ def main_game():
 
         # ステージ終了後の処理
         if not game_over:
-            clear_time = elapsed_time // 1000  # 秒単位
+            clear_time = time_str
         pygame.time.wait(1000)
 
     # ゲーム全体終了処理
-    save_game_result(stage_num - 1, clear_time)
-    pygame.quit()
-    sys.exit()
+    clear_floor = stage_num - 1
+    if clear_floor > 0:
+        save_game_result(clear_floor, clear_time)
+    else:
+        clear_time = "00:00.000"
+    
+    fade_out(screen)
+    choice = show_result_screen(screen, clear_floor, clear_time)
+
+    if choice == 0:
+        fade_out(screen)
+        main_game()  # Play Again
+    elif choice == 1:
+        fade_out(screen)
+        return  # Return to Title
+    elif choice == 2:
+        pygame.quit()
+        sys.exit()  # Quit the Game
