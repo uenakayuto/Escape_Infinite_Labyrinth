@@ -1,7 +1,11 @@
 import sqlite3
+import os
 
 def init_db():
-    conn = sqlite3.connect("game_records.db")
+    # データベースファイルの保存先を絶対パスで指定
+    db_path = os.path.join(os.path.dirname(__file__), 'game_records.db')
+    
+    conn = sqlite3.connect(db_path)
     c = conn.cursor()
     c.execute('''
         CREATE TABLE IF NOT EXISTS records (
@@ -15,7 +19,10 @@ def init_db():
     conn.close()
 
 def save_game_result(cleared_floors, last_clear_time):
-    conn = sqlite3.connect("game_records.db")
+    # データベースファイルの保存先を絶対パスで指定
+    db_path = os.path.join(os.path.dirname(__file__), 'game_records.db')
+    
+    conn = sqlite3.connect(db_path)
     c = conn.cursor()
     c.execute("INSERT INTO records (cleared_floors, last_clear_time) VALUES (?, ?)",
               (cleared_floors, last_clear_time))
