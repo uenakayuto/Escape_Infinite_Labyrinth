@@ -71,3 +71,9 @@ class Player:
 def generate_player():
     """プレイヤーの初期位置を生成"""
     return Player(60, 60)
+
+# How to Play用のプレイヤー画像を読み込み
+def load_player_image():
+    player_img_path = resource_path("img/player_look_left.png")
+    player_image = pygame.image.load(player_img_path).convert_alpha()
+    return pygame.transform.scale(player_image, (OBJECT_SIZE, OBJECT_SIZE))

@@ -5,13 +5,14 @@ from database import init_db, save_game_result
 from wall_blocks import load_wall_image, generate_wall_blocks
 from blocks import load_block_image, create_blocks
 from key import load_key_image
-from goal import load_goal_images
+from goal import load_goal_image
 from fade import fade_in, fade_out
 from countdown import countdown
 from random_generator import (
     generate_random_player, generate_random_blocks, generate_random_key,
     generate_random_goal, generate_random_enemies
 )
+from pause import show_pause_menu
 from logic import handle_enemy_collisions
 from result_screen import show_result_screen
 
@@ -29,7 +30,6 @@ def main_game():
 
     game_over = False
     stage_num = 0
-    start_time = pygame.time.get_ticks()
 
     while not game_over:
         # ===== ステージの初期化 =====
@@ -50,7 +50,7 @@ def main_game():
         used_positions.add(key_pos)
 
         # ゴール
-        goal_image = load_goal_images()
+        goal_image = load_goal_image()
         goal_pos = generate_random_goal(used_positions)
         used_positions.add(goal_pos)
 
@@ -82,6 +82,10 @@ def main_game():
             fade_in(screen, draw)
 
             countdown(screen, font_countdown, draw)  # カウントダウンを表示
+            start_time = pygame.time.get_ticks()
+            paused_time_total = 0
+            pause_start_time = None
+            is_paused = False
 
         # ===== ステージ内ループ =====
         while not stage_clear and not game_over:
@@ -91,6 +95,18 @@ def main_game():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        if not is_paused:
+                            pause_start_time = pygame.time.get_ticks()
+                            is_paused = True
+                            pause_result = show_pause_menu(screen)
+                            if pause_result == "quit":
+                                return  # タイトルに戻る
+                            # 再開処理
+                            paused_time_total += pygame.time.get_ticks() - pause_start_time
+                            pause_start_time = None
+                            is_paused = False
 
             # 入力処理
             keys = pygame.key.get_pressed()
@@ -136,7 +152,7 @@ def main_game():
             screen.blit(stage_text, (10, 10))  # 左上余白10px
 
             # --- 経過タイムの表示（右上） ---
-            elapsed_time = pygame.time.get_ticks() - start_time
+            elapsed_time = pygame.time.get_ticks() - start_time - paused_time_total
             minutes = elapsed_time // 60000
             seconds = (elapsed_time % 60000) // 1000
             milliseconds = elapsed_time % 1000

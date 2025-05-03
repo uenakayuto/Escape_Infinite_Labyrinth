@@ -65,3 +65,11 @@ def generate_enemies():
     Enemy(1200, 480, direction=-1, speed=3, vertical=True),
     Enemy(1200, 240, direction=1, speed=4, vertical=True),
 ]
+
+# 敵画像をHow_to_Play用に読み込み
+def load_enemy_image():
+    enemy_img_path = resource_path("img/enemy_look_left.png")
+    enemy_image = pygame.image.load(enemy_img_path).convert_alpha()
+    enemy_image = pygame.transform.scale(enemy_image, (OBJECT_SIZE, OBJECT_SIZE))
+    
+    return enemy_image
