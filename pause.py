@@ -1,6 +1,7 @@
 import pygame
 import sys
 from const import WIDTH, HEIGHT, WHITE, BLACK, FONT_SIZE_MENU, FONT_SIZE_GAME_TITLE
+from se_manager import se_get_key, se_cursor
 from fade import fade_out
 
 def show_pause_menu(screen):
@@ -12,6 +13,8 @@ def show_pause_menu(screen):
 
     menu_options = ["Resume the game", "Quit to title"]
     selected = 0
+
+    se_get_key.play()
 
     while True:
         # 背景を黒で塗りつぶす
@@ -40,12 +43,16 @@ def show_pause_menu(screen):
 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
+                    se_cursor.play()
                     selected = (selected - 1) % len(menu_options)
                 elif event.key == pygame.K_DOWN:
+                    se_cursor.play()
                     selected = (selected + 1) % len(menu_options)
                 elif event.key == pygame.K_RETURN:
                     if selected == 0:
+                        se_get_key.play()
                         return  # ゲーム再開
                     elif selected == 1:
+                        se_get_key.play()
                         fade_out(screen)
                         return "quit"  # タイトル画面などへ戻る指示

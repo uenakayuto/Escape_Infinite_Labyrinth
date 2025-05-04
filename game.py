@@ -8,10 +8,9 @@ from key import load_key_image
 from goal import load_goal_image
 from fade import fade_in, fade_out
 from countdown import countdown
-from random_generator import (
-    generate_random_player, generate_random_blocks, generate_random_key,
-    generate_random_goal, generate_random_enemies
-)
+from se_manager import se_fade_in_game, se_game_start_game, se_get_key, se_goal, se_game_over, se_menu_select
+from bgm_manager import play_bgm, bgm_game
+from canclearcheck import generate_valid_map
 from pause import show_pause_menu
 from logic import handle_enemy_collisions
 from result_screen import show_result_screen
@@ -33,33 +32,24 @@ def main_game():
 
     while not game_over:
         # ===== ステージの初期化 =====
-        player, player_pos = generate_random_player()
-        used_positions = set()
-        used_positions.add(player_pos)
+        player, block_positions, key_pos, goal_pos, enemies = generate_valid_map()
 
         # ブロック
         block_image = load_block_image()
-        block_positions = generate_random_blocks(used_positions)
         blocks = create_blocks(block_positions)
-        used_positions.update(block_positions)
 
         # 鍵
         key_collected = False
         key_image, key_icon = load_key_image()
-        key_pos = generate_random_key(used_positions)
-        used_positions.add(key_pos)
 
         # ゴール
         goal_image = load_goal_image()
-        goal_pos = generate_random_goal(used_positions)
-        used_positions.add(goal_pos)
-
-        # 敵
-        enemies = generate_random_enemies(player_pos, used_positions)
 
         # 壁
         wall_image = load_wall_image()
         wall_blocks = generate_wall_blocks()
+
+        key_se = None
 
         stage_clear = False
 
@@ -79,9 +69,12 @@ def main_game():
                     enemy.draw(screen)
                 player.draw(screen)
 
+            se_fade_in_game.play()  # フェードインSE
             fade_in(screen, draw)
 
             countdown(screen, font_countdown, draw)  # カウントダウンを表示
+            se_game_start_game.play()  # ゲームスタートSE
+            play_bgm(bgm_game)  # ゲームBGMを再生
             start_time = pygame.time.get_ticks()
             paused_time_total = 0
             pause_start_time = None
@@ -100,10 +93,18 @@ def main_game():
                         if not is_paused:
                             pause_start_time = pygame.time.get_ticks()
                             is_paused = True
+                            pygame.mixer.pause()
+                            pygame.mixer.music.pause()
                             pause_result = show_pause_menu(screen)
                             if pause_result == "quit":
+                                pygame.mixer.stop()
+                                pygame.mixer.music.stop()
+                                pygame.mixer.unpause()
+                                pygame.mixer.music.unpause()
                                 return  # タイトルに戻る
                             # 再開処理
+                            pygame.mixer.unpause()
+                            pygame.mixer.music.unpause()
                             paused_time_total += pygame.time.get_ticks() - pause_start_time
                             pause_start_time = None
                             is_paused = False
@@ -121,25 +122,36 @@ def main_game():
             player_rect = pygame.Rect(player.rect.topleft, (OBJECT_SIZE, OBJECT_SIZE))
 
             # 鍵との衝突
-            key_rect = pygame.Rect(key_pos[0] + OBJECT_SIZE/6, key_pos[1], OBJECT_SIZE*2/3, OBJECT_SIZE)
-            if player_rect.colliderect(key_rect):
-                key_collected = True
+            if not key_collected:
+                key_rect = pygame.Rect(key_pos[0] + OBJECT_SIZE/6, key_pos[1], OBJECT_SIZE*2/3, OBJECT_SIZE)
+                if player_rect.colliderect(key_rect):                
+                    key_se = se_get_key.play()
+                    key_collected = True
 
             # ゴールとの衝突
             goal_rect = pygame.Rect(goal_pos[0], goal_pos[1], OBJECT_SIZE, OBJECT_SIZE)
             if key_collected and player_rect.colliderect(goal_rect):
-                text = font_red.render("STAGE CLEAR!", True, RED)
-                text_rect = text.get_rect(center=(WIDTH//2, HEIGHT//2))
-                stage_clear = True
+                if not stage_clear:
+                    if key_se is not None:
+                        key_se.stop()
+                    se_goal.play()
+                    text = font_red.render("STAGE CLEAR!", True, RED)
+                    text_rect = text.get_rect(center=(WIDTH//2, HEIGHT//2))
+                    stage_clear = True
 
             # 敵との衝突
-            for enemy in enemies:
-                if player_rect.colliderect(enemy.rect):
-                    player.set_failure()
-                    text = font_red.render("GAME OVER", True, RED)
-                    text_rect = text.get_rect(center=(WIDTH//2, HEIGHT//2))
-                    game_over = True
-                    break
+            if not stage_clear:
+                for enemy in enemies:
+                    if player_rect.colliderect(enemy.rect):
+                        if not game_over:
+                            pygame.mixer.stop()
+                            pygame.mixer.music.stop()
+                            se_game_over.play()
+                            player.set_failure()
+                            text = font_red.render("GAME OVER", True, RED)
+                            text_rect = text.get_rect(center=(WIDTH//2, HEIGHT//2))
+                            game_over = True
+                            break
 
             # ===== 描画処理 =====
             screen.fill(BLACK)
@@ -198,9 +210,11 @@ def main_game():
     choice = show_result_screen(screen, clear_floor, clear_time)
 
     if choice == 0:
+        se_menu_select.play()
         fade_out(screen)
         main_game()  # Play Again
     elif choice == 1:
+        se_menu_select.play()
         fade_out(screen)
         return  # Return to Title
     elif choice == 2:

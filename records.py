@@ -2,6 +2,7 @@ import sqlite3
 import pygame
 import os
 from const import WIDTH, HEIGHT, BLACK, WHITE, FONT_SIZE_RECORDS, FONT_SIZE_FLOOR_TIME, FONT_SIZE_NO_RECORDS
+from se_manager import se_menu_select
 from fade import fade_out
 
 def format_time(seconds):
@@ -72,6 +73,7 @@ def show_records(screen):
                 pygame.quit()
                 exit()
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                fade_out(screen)
-                return
+                se_menu_select.play()
+                fade_out(screen, fade_bgm=False)
+                return True
         clock.tick(60)

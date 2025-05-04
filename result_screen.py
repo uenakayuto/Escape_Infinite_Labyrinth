@@ -1,6 +1,7 @@
 import pygame
 import sys
 from const import WIDTH, HEIGHT, WHITE, BLACK, FONT_SIZE_GAME_TITLE, FONT_SIZE_MENU
+from se_manager import se_get_key, se_cursor
 
 def show_result_screen(screen, clear_floor, clear_time):
     pygame.font.init()
@@ -17,6 +18,8 @@ def show_result_screen(screen, clear_floor, clear_time):
     button_spacing = 50
     return_to_title_index = 1
     base_y = (7 * HEIGHT // 8) - return_to_title_index * button_spacing
+
+    se_get_key.play()
 
     while True:
         screen.fill(BLACK)
@@ -61,8 +64,10 @@ def show_result_screen(screen, clear_floor, clear_time):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     selected_index = (selected_index - 1) % len(menu_items)
+                    se_cursor.play()
                 elif event.key == pygame.K_DOWN:
                     selected_index = (selected_index + 1) % len(menu_items)
+                    se_cursor.play()
                 elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
                     return selected_index
                 elif event.key == pygame.K_ESCAPE:
