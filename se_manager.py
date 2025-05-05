@@ -10,13 +10,13 @@ def load_sound(file_path, volume=1.0):
     return sound
 
 # 効果音の読み込み
-se_game_start = load_sound("se/game_start.wav")
-se_menu_select = load_sound("se/menu_select.wav")
-se_cursor = load_sound("se/cursor.wav")
-se_fade_in_game = load_sound("se/fade_in_game.wav", 0.8)
-se_countdown = load_sound("se/countdown.wav")
-se_game_start_game = load_sound("se/game_start_game.wav")
-se_get_key = load_sound("se/get_key.wav")
-se_goal = load_sound("se/goal.wav")
-se_game_over = load_sound("se/game_over.wav")
-se_select_credits = load_sound("se/select_credits.wav")
+se_game_start = load_sound("se/game_start.ogg")
+se_menu_select = load_sound("se/menu_select.ogg")
+se_cursor = load_sound("se/cursor.ogg")
+se_fade_in_game = load_sound("se/fade_in_game.ogg", 0.8)
+se_countdown = load_sound("se/countdown.ogg")
+se_game_start_game = load_sound("se/game_start_game.ogg")
+se_get_key = load_sound("se/get_key.ogg")
+se_goal = load_sound("se/goal.ogg")
+se_game_over = load_sound("se/game_over.ogg")
+se_select_credits = load_sound("se/select_credits.ogg")
