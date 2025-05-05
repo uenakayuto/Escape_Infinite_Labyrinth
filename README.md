@@ -52,7 +52,7 @@ pip install pygame
 pip install -r requirements.txt
 ```
 
-1. ゲームの実行
+### 3. ゲームの実行
   - リポジトリに移動し，仮想環境をアクティベートした状態で，以下のコマンドを実行
   '''
   python main.py
