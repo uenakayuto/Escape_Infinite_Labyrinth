@@ -13,5 +13,5 @@ def resource_path(relative_path):
 # 画像の読み込みとリサイズ
 def load_scaled_image(path, size):
     full_path = resource_path(path)
-    image = pygame.image.load(full_path).convert()
+    image = pygame.image.load(full_path).convert_alpha()
     return pygame.transform.scale(image, (size, size))

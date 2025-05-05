@@ -1,6 +1,6 @@
 import pygame
 from const import OBJECT_SIZE, WIDTH, HEIGHT
-from util import resource_path
+from util import load_scaled_image
 
 class Enemy:
     def __init__(self, x, y, direction, speed, vertical=False):
@@ -11,18 +11,12 @@ class Enemy:
         self.prev_pos = self.rect.topleft
 
         # 画像読み込み
-        enemy_img_left_path = resource_path("img/enemy_look_left.png")
-        self.image_left = pygame.image.load(enemy_img_left_path).convert_alpha()
-        self.image_left = pygame.transform.scale(self.image_left, (OBJECT_SIZE, OBJECT_SIZE))
+        self.image_left = load_scaled_image("img/enemy_look_left.png", OBJECT_SIZE)
         self.image_right = pygame.transform.flip(self.image_left, True, False)
 
-        enemy_img_up_path = resource_path("img/enemy_look_up.png")
-        self.image_up = pygame.image.load(enemy_img_up_path).convert_alpha()
-        self.image_up = pygame.transform.scale(self.image_up, (OBJECT_SIZE, OBJECT_SIZE))
+        self.image_up = load_scaled_image("img/enemy_look_up.png", OBJECT_SIZE)
 
-        enemy_img_down_path = resource_path("img/enemy_look_down.png")
-        self.image_down = pygame.image.load(enemy_img_down_path).convert_alpha()
-        self.image_down = pygame.transform.scale(self.image_down, (OBJECT_SIZE, OBJECT_SIZE))
+        self.image_down = load_scaled_image("img/enemy_look_down.png", OBJECT_SIZE)
 
         self.image = self.get_image()
 
@@ -60,8 +54,4 @@ class Enemy:
 
 # 敵画像をHow_to_Play用に読み込み
 def load_enemy_image():
-    enemy_img_path = resource_path("img/enemy_look_left.png")
-    enemy_image = pygame.image.load(enemy_img_path).convert_alpha()
-    enemy_image = pygame.transform.scale(enemy_image, (OBJECT_SIZE, OBJECT_SIZE))
-    
-    return enemy_image
+    return load_scaled_image("img/enemy_look_left.png", OBJECT_SIZE)

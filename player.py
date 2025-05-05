@@ -1,6 +1,6 @@
 import pygame
 from const import OBJECT_SIZE, PLAYER_SPEED, WIDTH, HEIGHT
-from util import resource_path
+from util import load_scaled_image
 
 class Player:
     def __init__(self, x, y, speed=PLAYER_SPEED):
@@ -9,11 +9,11 @@ class Player:
         self.failed = False
         
         # 画像読み込み
-        self.image_left = self.load_and_scale("img/player_look_left.png")
+        self.image_left = load_scaled_image("img/player_look_left.png", OBJECT_SIZE)
         self.image_right = pygame.transform.flip(self.image_left, True, False)
-        self.image_up = self.load_and_scale("img/player_look_up.png")
-        self.image_down = self.load_and_scale("img/player_look_down.png")
-        self.image_failure = self.load_and_scale("img/player_failure.png")
+        self.image_up = load_scaled_image("img/player_look_up.png", OBJECT_SIZE)
+        self.image_down = load_scaled_image("img/player_look_down.png", OBJECT_SIZE)
+        self.image_failure = load_scaled_image("img/player_failure.png", OBJECT_SIZE)
         
         # 初期向き: 画面の中心に対して決定（例：画面右半分なら左向き）
         if self.rect.x > WIDTH / 2:
@@ -23,12 +23,6 @@ class Player:
         
         # 移動前の位置の記録用（衝突などで元に戻すため）
         self.prev_pos = self.rect.topleft
-
-    def load_and_scale(self, image_path):
-        """画像を読み込み、OBJECT_SIZEでリサイズする"""
-        full_path = resource_path(image_path)
-        image = pygame.image.load(full_path).convert_alpha()
-        return pygame.transform.scale(image, (OBJECT_SIZE, OBJECT_SIZE))
     
     def handle_input(self, keys, block_positions):
         self.prev_pos = self.rect.topleft  # 現在位置を記録
@@ -70,6 +64,4 @@ class Player:
 
 # How to Play用のプレイヤー画像を読み込み
 def load_player_image():
-    player_img_path = resource_path("img/player_look_left.png")
-    player_image = pygame.image.load(player_img_path).convert_alpha()
-    return pygame.transform.scale(player_image, (OBJECT_SIZE, OBJECT_SIZE))
+    return load_scaled_image("img/player_look_left.png", OBJECT_SIZE)

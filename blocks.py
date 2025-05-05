@@ -1,12 +1,10 @@
 import pygame
 from const import OBJECT_SIZE
-from util import resource_path
+from util import load_scaled_image
 
 # ブロック画像の読み込み
 def load_block_image():
-    path = resource_path("img/block.png")
-    image = pygame.image.load(path).convert_alpha()
-    return pygame.transform.scale(image, (OBJECT_SIZE, OBJECT_SIZE))
+    return load_scaled_image("img/block.png", OBJECT_SIZE)
 
 # ブロックRectオブジェクトを作成
 def create_blocks(positions):
