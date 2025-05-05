@@ -68,10 +68,6 @@ class Player:
     def set_failure(self):
             self.failed = True
 
-def generate_player():
-    """プレイヤーの初期位置を生成"""
-    return Player(60, 60)
-
 # How to Play用のプレイヤー画像を読み込み
 def load_player_image():
     player_img_path = resource_path("img/player_look_left.png")

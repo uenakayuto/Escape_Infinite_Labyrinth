@@ -14,7 +14,7 @@ MARGIN = 100
 # 色定義（RGB）
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-RED   = (255, 0, 0)
+RED   = (200, 0, 0)
 
 # フォントサイズ
 FONT_SIZE_RED = 192
@@ -43,6 +43,6 @@ OFFSET_X = 40
 OFFSET_Y = -20
 
 # ブロックの数
-NUM_BLOCKS = 36
+NUM_BLOCKS = 28
 # 敵の数
 NUM_ENEMIES = 8

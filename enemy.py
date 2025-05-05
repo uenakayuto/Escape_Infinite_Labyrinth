@@ -58,14 +58,6 @@ class Enemy:
         self.rect.topleft = self.prev_pos
         self.image = self.get_image()
 
-def generate_enemies():
-    return [
-    Enemy(1200, 600, direction=1, speed=2, vertical=True),
-    Enemy(1200, 720, direction=-1, speed=10, vertical=True),
-    Enemy(1200, 480, direction=-1, speed=3, vertical=True),
-    Enemy(1200, 240, direction=1, speed=4, vertical=True),
-]
-
 # 敵画像をHow_to_Play用に読み込み
 def load_enemy_image():
     enemy_img_path = resource_path("img/enemy_look_left.png")
