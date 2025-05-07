@@ -1,7 +1,7 @@
 from const import OBJECT_SIZE, WIDTH, HEIGHT
 from util import load_scaled_image
 
-# 壁画像の読み込み関数（再利用可能にする）
+# 壁画像の読み込み関数
 def load_wall_image():
     return load_scaled_image("img/block.png", OBJECT_SIZE)
 

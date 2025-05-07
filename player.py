@@ -15,7 +15,7 @@ class Player:
         self.image_down = load_scaled_image("img/player_look_down.png", OBJECT_SIZE)
         self.image_failure = load_scaled_image("img/player_failure.png", OBJECT_SIZE)
         
-        # 初期向き: 画面の中心に対して決定（例：画面右半分なら左向き）
+        # 初期向き: 画面の中心に対して決定
         if self.rect.x > WIDTH / 2:
             self.image = self.image_left
         else:
