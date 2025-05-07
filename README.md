@@ -1,5 +1,5 @@
 # Escape_Infinite_Labyrinth
-植中雄斗とChatGPTの共同開発ゲーム
+植中雄斗の個人開発ゲーム（ChatGPT利用）です．
 
 ## 使用技術
 - Python
