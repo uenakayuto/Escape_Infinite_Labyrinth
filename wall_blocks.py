@@ -1,12 +1,9 @@
-import pygame
 from const import OBJECT_SIZE, WIDTH, HEIGHT
-from util import resource_path
+from util import load_scaled_image
 
 # 壁画像の読み込み関数（再利用可能にする）
 def load_wall_image():
-    wall_image_path = resource_path("img/block.png")
-    image = pygame.image.load(wall_image_path).convert()
-    return pygame.transform.scale(image, (OBJECT_SIZE, OBJECT_SIZE))
+    return load_scaled_image("img/block.png", OBJECT_SIZE)
 
 # 壁の座標を生成
 def generate_wall_blocks():
