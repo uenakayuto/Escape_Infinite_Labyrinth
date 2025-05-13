@@ -175,3 +175,5 @@ cython_debug/
 
 # database
 game_records.db
+
+.firstgame
