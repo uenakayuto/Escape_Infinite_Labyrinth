@@ -22,8 +22,8 @@ def is_path_clear(start, goal, blocked_set):
         for dx, dy in directions:
             next_pos = (current[0] + dx, current[1] + dy)
             if (
-                0 <= next_pos[0] < WIDTH and
-                0 <= next_pos[1] < HEIGHT and
+                OBJECT_SIZE <= next_pos[0] < WIDTH - OBJECT_SIZE and
+                OBJECT_SIZE <= next_pos[1] < HEIGHT - OBJECT_SIZE and
                 next_pos not in blocked_set and
                 next_pos not in visited
             ):
