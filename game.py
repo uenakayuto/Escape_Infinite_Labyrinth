@@ -177,12 +177,12 @@ def main_game():
             for pos in block_positions:
                 screen.blit(block_image, pos)
 
+            screen.blit(goal_image, (goal_pos[0], goal_pos[1]))
+
             if not key_collected:
                 screen.blit(key_image, (key_pos[0], key_pos[1]))
             else:
                 screen.blit(key_icon, (player.rect.x + OFFSET_X, player.rect.y + OFFSET_Y))
-
-            screen.blit(goal_image, (goal_pos[0], goal_pos[1]))
 
             for enemy in enemies:
                 enemy.draw(screen)
