@@ -35,7 +35,7 @@ def show_title_screen(screen):
             screen.blit(text, text_rect)
 
         # Credits ボタン
-        credits_text = credits_font.render("credits [C]", True, WHITE)
+        credits_text = credits_font.render("Credits [C]", True, WHITE)
         credits_rect = credits_text.get_rect(midbottom=(WIDTH // 2, HEIGHT - 10))
         screen.blit(credits_text, credits_rect)
 
