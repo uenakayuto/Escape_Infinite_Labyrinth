@@ -32,7 +32,7 @@ def show_how_to_play(screen):
         ("blank", ""),
         ("subtitle", "Controls"),
         ("text", "Arrow keys - Move"),
-        ("text", "Esc - Pause / Return to menu"),
+        ("text", "Esc - Pause"),
         ("blank", ""),
         ("subtitle", "Rules"),
         ("image_text", ["Move the player using the arrow keys."], load_player_image()),
