@@ -6,5 +6,8 @@ export const COLORS = {
   redText: '#ff0000',
   border: '#000000',
   whiteBorder: '#f5f5f5',
-  fade: '#000000'
+  fade: '#000000',
+  gold: '#ffd700',
+  silver: '#c0c0c0',
+  bronze: '#cd7f32'
 };

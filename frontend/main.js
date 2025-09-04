@@ -3,11 +3,17 @@ import { FONT_SIZES, FONT_STYLE, SPACE, SCREEN_BOUNDS } from "./util/fontsize.js
 import { fadeOut } from "./util/fade.js";
 import { startGame } from "./game/game.js";
 import { showHowToPlay } from "./howToPlay/howToPlay.js";
-import { showRecords } from "./record/record.js";
+import { showRecords, drawRecords } from "./record/record.js";
 import { showCredits } from "./credits/credits.js";
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+
+// main.js
+const isLocal = location.hostname === "127.0.0.1";
+export const API_BASE_URL = isLocal
+  ? "http://localhost:3000"   // 開発時
+  : "https://example.com";    // デプロイ後
 
 canvas.width = SCREEN_BOUNDS.drawW;
 canvas.height = SCREEN_BOUNDS.drawH;
@@ -75,10 +81,28 @@ async function handleTitleKeys(e) {
         });
         showHowToPlay(ctx, canvas);
       } else if (selectedTitleMenuIndex === 2) {
-        await fadeOut(ctx, canvas, 1000, 1000, () => {
-          drawTitle();
-        });
-        showRecords(ctx, canvas);
+        try {
+          // 1. API を非同期で叩く（await せず Promise を保持）
+          const fetchPromise = fetch(`${API_BASE_URL}/api/fetch`).then(res => res.json());
+
+          // 2. フェードアウトを非同期で開始
+          const fadeRecordPromise = fadeOut(ctx, canvas, 1000, 1000, () => {
+            drawTitle();
+          });
+
+          // 3. 両方が終わるのを待つ
+          const records = await fetchPromise;
+          await fadeRecordPromise;
+
+          await showRecords(ctx, canvas, records);
+          await fadeOut(ctx, canvas, 1000, 1000, () => {
+            drawRecords(ctx, canvas, records);
+          });
+
+        } catch (err) {
+          console.error("ランキング取得エラー:", err);
+        }
+        startTitle();
       }
     }
   }

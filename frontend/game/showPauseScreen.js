@@ -44,7 +44,7 @@ export function showPauseScreen(ctx, canvas, boardData) {
   });
 }
 
-function drawPauseScreen(ctx, canvas, boardData) {
+export function drawPauseScreen(ctx, canvas, boardData) {
 
   // 背景を描画
   drawGameBoard(ctx, canvas, boardData);

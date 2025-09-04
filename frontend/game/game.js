@@ -8,8 +8,8 @@ import { gameLogic } from "./logic.js";
 import { showHoldScreen, drawScreenToHold } from "./showHoldScreen.js";
 import { showResult } from "../result/result.js";
 import { COLORS } from "../util/color.js";
-import { showPauseScreen } from "./showPauseScreen.js";
-import { startTitle } from "../main.js";
+import { showPauseScreen, drawPauseScreen } from "./showPauseScreen.js";
+import { startTitle, API_BASE_URL } from "../main.js";
 import { drawResult } from "../result/result.js";
 
 const { drawW, drawH } = SCREEN_BOUNDS;
@@ -216,14 +216,14 @@ async function gameLoop(ctx, canvas, boardData, playerName) {
     else if (responseFromPause === 'restart') {
       // リスタート
       await fadeOut(ctx, canvas, 1000, 1000, () => {
-        drawGameBoard(ctx, canvas, boardData);
+        drawPauseScreen(ctx, canvas, boardData);
       });
       startGame(ctx, canvas, playerName);
     }
     else if (responseFromPause === 'quit') {
       // タイトルへ戻る
       await fadeOut(ctx, canvas, 1000, 1000, () => {
-        drawGameBoard(ctx, canvas, boardData);
+        drawPauseScreen(ctx, canvas, boardData);
       });
       startTitle();
     }
@@ -266,22 +266,40 @@ async function gameLoop(ctx, canvas, boardData, playerName) {
       document.removeEventListener('keyup', handleGameKeyUp);
 
       elapsedTime = performance.now() - startTime - pauseElapsedTime;
+      const clearTimeAfterParse = parseTime(clearTime);
+      const date = new Date().toISOString();
+
+      if (playerName !== "") {
+        fetch(`${API_BASE_URL}/api/register`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            playerName,
+            clearFloor,
+            clearTime,
+            clearTimeAfterParse,
+            date
+          })
+        }).catch(err => console.error("登録エラー:", err));
+      }
+
       await showHoldScreen(ctx, canvas, boardData, 1000, "GAME OVER");
 
       await fadeOut(ctx, canvas, 1000, 1000, () => {
         drawScreenToHold(ctx, canvas, boardData, "GAME OVER");
       });
       
-      clearTime = parseTime(clearTime);
-      const resultAction = await showResult(ctx, canvas, clearFloor, clearTime);
+      const resultAction = await showResult(ctx, canvas, clearFloor, clearTimeAfterParse);
       if (resultAction === 'restart') {
         await fadeOut(ctx, canvas, 1000, 1000, () => {
-          drawResult(ctx, canvas, clearFloor, clearTime);
+          drawResult(ctx, canvas, clearFloor, clearTimeAfterParse);
         });
         startGame(ctx, canvas, playerName);
       } else if (resultAction === 'title') {
         await fadeOut(ctx, canvas, 1000, 1000, () => {
-          drawResult(ctx, canvas, clearFloor, clearTime);
+          drawResult(ctx, canvas, clearFloor, clearTimeAfterParse);
         });
         startTitle();
       }
