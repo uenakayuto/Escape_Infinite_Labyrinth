@@ -2,6 +2,7 @@ import { COLORS } from "./util/color.js";
 import { FONT_SIZES, FONT_STYLE, SPACE, SCREEN_BOUNDS } from "./util/fontsize.js";
 import { fadeOut } from "./util/fade.js";
 import { startGame } from "./game/game.js";
+import { generateInitialBoard } from "./game/randomGenerator.js";
 import { showHowToPlay } from "./howToPlay/howToPlay.js";
 import { showRecords, drawRecords } from "./record/record.js";
 import { showCredits } from "./credits/credits.js";
@@ -71,10 +72,14 @@ async function handleTitleKeys(e) {
       // メニューに応じて遷移
       cleanupTitle();
       if (selectedTitleMenuIndex === 0) {
-        await fadeOut(ctx, canvas, 1000, 1000, () => {
+        const fadeOutPromise = fadeOut(ctx, canvas, 1000, 1000, () => {
           drawTitle();
         });
-        startGame(ctx, canvas, playerName);
+        const initialBoardPromise = generateInitialBoard();
+
+        await fadeOutPromise;
+        const boardData = await initialBoardPromise;
+        startGame(ctx, canvas, playerName, boardData);
       } else if (selectedTitleMenuIndex === 1) {
         await fadeOut(ctx, canvas, 1000, 1000, () => {
           drawTitle();
@@ -82,17 +87,14 @@ async function handleTitleKeys(e) {
         showHowToPlay(ctx, canvas);
       } else if (selectedTitleMenuIndex === 2) {
         try {
-          // 1. API を非同期で叩く（await せず Promise を保持）
-          const fetchPromise = fetch(`${API_BASE_URL}/api/fetch`).then(res => res.json());
-
-          // 2. フェードアウトを非同期で開始
-          const fadeRecordPromise = fadeOut(ctx, canvas, 1000, 1000, () => {
+          const fadeOutPromise = fadeOut(ctx, canvas, 1000, 1000, () => {
             drawTitle();
           });
 
-          // 3. 両方が終わるのを待つ
+          const fetchPromise = fetch(`${API_BASE_URL}/api/fetch`).then(res => res.json());
+
+          await fadeOutPromise;
           const records = await fetchPromise;
-          await fadeRecordPromise;
 
           await showRecords(ctx, canvas, records);
           await fadeOut(ctx, canvas, 1000, 1000, () => {

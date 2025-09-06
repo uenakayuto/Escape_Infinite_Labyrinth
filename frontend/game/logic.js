@@ -1,5 +1,5 @@
 import { SCREEN_BOUNDS } from "../util/fontsize.js";
-import { OBJECT_SIZE } from "./setting.js";
+import { OBJECT_SIZE, DIFF_OBJECT } from "./setting.js";
 import { gameState } from "./game.js";
 
 const { drawW, drawH } = SCREEN_BOUNDS;
@@ -35,7 +35,6 @@ export function gameLogic(board, pressedKeys) {
     if (axis === 0) newX += (dir === 0 ? speed : -speed);
     else newY += (dir === 0 ? speed : -speed);
 
-    // 衝突したら座標は元の位置に戻す（ブロック衝突判定前ではなく移動前の originalPos に戻す）
     const resolvedPos = resolveCollision(newX, newY, axis, dir, blocks);
     newX = resolvedPos.x;
     newY = resolvedPos.y;
@@ -50,38 +49,126 @@ export function gameLogic(board, pressedKeys) {
       const e1 = newEnemies[i];
       const e2 = newEnemies[j];
 
-      if (Math.abs(e1.pos.x - e2.pos.x) < OBJECT_SIZE &&
-          Math.abs(e1.pos.y - e2.pos.y) < OBJECT_SIZE) {
+      if (Math.abs(e1.pos.x - e2.pos.x) < OBJECT_SIZE - 2 * DIFF_OBJECT &&
+          Math.abs(e1.pos.y - e2.pos.y) < OBJECT_SIZE - 2 * DIFF_OBJECT) {
 
-        if (e1.axis !== e2.axis || e1.dir !== e2.dir) {
+        if (e1.axis !== e2.axis) {
+          // --- 軸が異なる場合の厳密判定 ---
+          const dx = Math.abs(e1.originalPos.x - e2.originalPos.x);
+          const dy = Math.abs(e1.originalPos.y - e2.originalPos.y);
+
+          if (dx < OBJECT_SIZE - 2 * DIFF_OBJECT) {
+            // 縦方向でほぼ重なっている → 縦に動く敵のみ反転
+            if (e1.axis === 1) {
+              e1.pos.y = e1.dir === 0 ? e2.pos.y - (OBJECT_SIZE - 2 * DIFF_OBJECT) : e2.pos.y + (OBJECT_SIZE - 2 * DIFF_OBJECT);
+              e1.dir = e1.dir === 0 ? 1 : 0;
+            } else {
+              e2.pos.y = e2.dir === 0 ? e1.pos.y - (OBJECT_SIZE - 2 * DIFF_OBJECT) : e1.pos.y + (OBJECT_SIZE - 2 * DIFF_OBJECT);
+              e2.dir = e2.dir === 0 ? 1 : 0;
+            }
+          } else if (dy < OBJECT_SIZE - 2 * DIFF_OBJECT) {
+            // 横方向でほぼ重なっている → 横に動く敵のみ反転
+            if (e1.axis === 0) {
+              e1.pos.x = e1.dir === 0 ? e2.pos.x - (OBJECT_SIZE - 2 * DIFF_OBJECT) : e2.pos.x + (OBJECT_SIZE - 2 * DIFF_OBJECT);
+              e1.dir = e1.dir === 0 ? 1 : 0;
+            } else {
+              e2.pos.x = e2.dir === 0 ? e1.pos.x - (OBJECT_SIZE - 2 * DIFF_OBJECT) : e1.pos.x + (OBJECT_SIZE - 2 * DIFF_OBJECT);
+              e2.dir = e2.dir === 0 ? 1 : 0;
+            }
+          } else {
+            const commonDivisor = gcd(e1.speed, e2.speed);
+            const e1EffectiveSpeed = e1.speed / commonDivisor;
+            const e2EffectiveSpeed = e2.speed / commonDivisor;
+
+            if (e1.axis === 0) {
+              const canMoveE1 = (dx - (OBJECT_SIZE - 2 * DIFF_OBJECT)) / e1EffectiveSpeed;
+              const canMoveE2 = (dy - (OBJECT_SIZE - 2 * DIFF_OBJECT)) / e2EffectiveSpeed;
+              if (canMoveE1 < canMoveE2) {
+                e1.pos.x = e1.dir === 0 ? e1.originalPos.x + e1EffectiveSpeed * canMoveE2 : e1.originalPos.x - e1EffectiveSpeed * canMoveE2;
+                e2.pos.y = e2.dir === 0 ? e1.originalPos.y - (OBJECT_SIZE - 2 * DIFF_OBJECT) : e1.originalPos.y + (OBJECT_SIZE - 2 * DIFF_OBJECT);
+                e2.dir = e2.dir === 0 ? 1 : 0;
+              } else if (canMoveE2 < canMoveE1) {
+                e2.pos.y = e2.dir === 0 ? e2.originalPos.y + e2EffectiveSpeed * canMoveE1 : e2.originalPos.y - e2EffectiveSpeed * canMoveE1;
+                e1.pos.x = e1.dir === 0 ? e2.originalPos.x - (OBJECT_SIZE - 2 * DIFF_OBJECT) : e2.originalPos.x + (OBJECT_SIZE - 2 * DIFF_OBJECT);
+                e1.dir = e1.dir === 0 ? 1 : 0;
+              } else {
+                e1.pos.x = e1.dir === 0 ? e1.originalPos.x + e1EffectiveSpeed * canMoveE1 : e1.originalPos.x - e1EffectiveSpeed * canMoveE1;
+                e2.pos.y = e2.dir === 0 ? e2.originalPos.y + e2EffectiveSpeed * canMoveE2 : e2.originalPos.y - e2EffectiveSpeed * canMoveE2;
+                e1.dir = e1.dir === 0 ? 1 : 0;
+                e2.dir = e2.dir === 0 ? 1 : 0;
+              }
+            } else {
+              const canMoveE1 = (dy - (OBJECT_SIZE - 2 * DIFF_OBJECT)) / e1EffectiveSpeed;
+              const canMoveE2 = (dx - (OBJECT_SIZE - 2 * DIFF_OBJECT)) / e2EffectiveSpeed;
+              if (canMoveE1 < canMoveE2) {
+                e1.pos.y = e1.dir === 0 ? e1.originalPos.y + e1EffectiveSpeed * canMoveE2 : e1.originalPos.y - e1EffectiveSpeed * canMoveE2;
+                e2.pos.x = e2.dir === 0 ? e1.originalPos.x - (OBJECT_SIZE - 2 * DIFF_OBJECT) : e1.originalPos.x + (OBJECT_SIZE - 2 * DIFF_OBJECT);
+                e2.dir = e2.dir === 0 ? 1 : 0;
+              } else if (canMoveE2 < canMoveE1) {
+                e2.pos.x = e2.dir === 0 ? e2.originalPos.x + e2EffectiveSpeed * canMoveE1 : e2.originalPos.x - e2EffectiveSpeed * canMoveE1;
+                e1.pos.y = e1.dir === 0 ? e2.originalPos.y - (OBJECT_SIZE - 2 * DIFF_OBJECT) : e2.originalPos.y + (OBJECT_SIZE - 2 * DIFF_OBJECT);
+                e1.dir = e1.dir === 0 ? 1 : 0;
+              } else {
+                e1.pos.y = e1.dir === 0 ? e1.originalPos.y + e1EffectiveSpeed * canMoveE1 : e1.originalPos.y - e1EffectiveSpeed * canMoveE1;
+                e2.pos.x = e2.dir === 0 ? e2.originalPos.x + e2EffectiveSpeed * canMoveE2 : e2.originalPos.x - e2EffectiveSpeed * canMoveE2;
+                e1.dir = e1.dir === 0 ? 1 : 0;
+                e2.dir = e2.dir === 0 ? 1 : 0;
+              }
+            }
+          }
+        } else if (e1.dir !== e2.dir) {
+          const commonDivisor = gcd(e1.speed, e2.speed);
+          const e1EffectiveSpeed = e1.speed / commonDivisor;
+          const e2EffectiveSpeed = e2.speed / commonDivisor;
+          if (e1.axis === 0) {
+            const dx = Math.abs(e1.originalPos.x - e2.originalPos.x);
+            const canMove = (dx - (OBJECT_SIZE - 2 * DIFF_OBJECT)) / (e1EffectiveSpeed + e2EffectiveSpeed);
+            e1.pos.x = e1.dir === 0 ? e1.originalPos.x + e1EffectiveSpeed * canMove : e1.originalPos.x - e1EffectiveSpeed * canMove;
+            e2.pos.x = e2.dir === 0 ? e2.originalPos.x + e2EffectiveSpeed * canMove : e2.originalPos.x - e2EffectiveSpeed * canMove;
+          } else {
+            const dy = Math.abs(e1.originalPos.y - e2.originalPos.y);
+            const canMove = (dy - (OBJECT_SIZE - 2 * DIFF_OBJECT)) / (e1EffectiveSpeed + e2EffectiveSpeed);
+            e1.pos.y = e1.dir === 0 ? e1.originalPos.y + e1EffectiveSpeed * canMove : e1.originalPos.y - e1EffectiveSpeed * canMove;
+            e2.pos.y = e2.dir === 0 ? e2.originalPos.y + e2EffectiveSpeed * canMove : e2.originalPos.y - e2EffectiveSpeed * canMove;
+          }
           e1.dir = e1.dir === 0 ? 1 : 0;
           e2.dir = e2.dir === 0 ? 1 : 0;
         } else {
-          if (e1.speed > e2.speed) e1.dir = e1.dir === 0 ? 1 : 0;
-          else if (e2.speed > e1.speed) e2.dir = e2.dir === 0 ? 1 : 0;
-          else {
+          if (e1.speed > e2.speed) {
+            if (e1.axis === 0) {
+              e1.pos.x = e1.dir === 0 ? e2.pos.x - (OBJECT_SIZE - 2 * DIFF_OBJECT) : e2.pos.x + (OBJECT_SIZE - 2 * DIFF_OBJECT);
+            } else {
+              e1.pos.y = e1.dir === 0 ? e2.pos.y - (OBJECT_SIZE - 2 * DIFF_OBJECT) : e2.pos.y + (OBJECT_SIZE - 2 * DIFF_OBJECT);
+            }
+            e1.dir = e1.dir === 0 ? 1 : 0;
+          } else if (e2.speed > e1.speed) {
+            if (e2.axis === 0) {
+              e2.pos.x = e2.dir === 0 ? e1.pos.x - (OBJECT_SIZE - 2 * DIFF_OBJECT) : e1.pos.x + (OBJECT_SIZE - 2 * DIFF_OBJECT);
+            } else {
+              e2.pos.y = e2.dir === 0 ? e1.pos.y - (OBJECT_SIZE - 2 * DIFF_OBJECT) : e1.pos.y + (OBJECT_SIZE - 2 * DIFF_OBJECT);
+            }
+            e2.dir = e2.dir === 0 ? 1 : 0;
+          } else {
             e1.dir = e1.dir === 0 ? 1 : 0;
             e2.dir = e2.dir === 0 ? 1 : 0;
+            e1.pos = { ...e1.originalPos };
+            e2.pos = { ...e2.originalPos };
           }
         }
-
-        // 衝突後に戻す座標はブロック衝突前の originalPos を使用
-        e1.pos = { ...e1.originalPos };
-        e2.pos = { ...e2.originalPos };
       }
     }
   }
 
   if (!gameState.isHoldingKeyItem) {
-    if (Math.abs(player.pos.x - keyItem.pos.x) < OBJECT_SIZE &&
-        Math.abs(player.pos.y - keyItem.pos.y) < OBJECT_SIZE) {
+    if (Math.abs(player.pos.x - keyItem.pos.x) < OBJECT_SIZE - 2 * DIFF_OBJECT &&
+        Math.abs(player.pos.y - keyItem.pos.y) < OBJECT_SIZE - 2 * DIFF_OBJECT) {
       gameState.isHoldingKeyItem = true;
     }
   }
 
   if (gameState.isHoldingKeyItem) {
-    if (Math.abs(player.pos.x - goal.pos.x) < OBJECT_SIZE &&
-        Math.abs(player.pos.y - goal.pos.y) < OBJECT_SIZE) {
+    if (Math.abs(player.pos.x - goal.pos.x) < OBJECT_SIZE - 2 * DIFF_OBJECT &&
+        Math.abs(player.pos.y - goal.pos.y) < OBJECT_SIZE - 2 * DIFF_OBJECT) {
       gameState.isGoal = true;
     }
   }
@@ -108,8 +195,8 @@ function resolveCollision(x, y, axis, dir, blocks) {
     dir = 0;
     return { x, y, dir };
   }
-  if (x > drawW - 2 * OBJECT_SIZE) {
-    x = drawW - 2 * OBJECT_SIZE;
+  if (x > drawW - OBJECT_SIZE - (OBJECT_SIZE - 2 * DIFF_OBJECT)) {
+    x = drawW - OBJECT_SIZE - (OBJECT_SIZE - 2 * DIFF_OBJECT);
     dir = 1;
     return { x, y, dir };
   }
@@ -118,21 +205,21 @@ function resolveCollision(x, y, axis, dir, blocks) {
     dir = 0;
     return { x, y, dir };
   }
-  if (y > drawH - 2 * OBJECT_SIZE) {
-    y = drawH - 2 * OBJECT_SIZE;
+  if (y > drawH - OBJECT_SIZE - (OBJECT_SIZE - 2 * DIFF_OBJECT)) {
+    y = drawH - OBJECT_SIZE - (OBJECT_SIZE - 2 * DIFF_OBJECT);
     dir = 1;
     return { x, y, dir };
   }
 
   // ブロックとの判定
   for (const block of blocks) {
-    if (Math.abs(x - block.pos.x) < OBJECT_SIZE &&
-        Math.abs(y - block.pos.y) < OBJECT_SIZE) {
+    if (Math.abs(x - DIFF_OBJECT - block.pos.x) < OBJECT_SIZE - DIFF_OBJECT &&
+        Math.abs(y - DIFF_OBJECT - block.pos.y) < OBJECT_SIZE - DIFF_OBJECT) {
       
       // axisとdirを考慮して補正
       if (axis === 0) { // 横方向移動中
         if (dir === 0) { // 右移動
-          x = block.pos.x - OBJECT_SIZE;
+          x = block.pos.x - (OBJECT_SIZE - 2 * DIFF_OBJECT);
           dir = 1;
           return { x, y, dir };
         } else { // 左移動
@@ -142,7 +229,7 @@ function resolveCollision(x, y, axis, dir, blocks) {
         }
       } else { // 縦方向移動中
         if (dir === 0) { // 下移動
-          y = block.pos.y - OBJECT_SIZE;
+          y = block.pos.y - (OBJECT_SIZE - 2 * DIFF_OBJECT);
           dir = 1;
           return { x, y, dir };
         } else { // 上移動
@@ -158,6 +245,10 @@ function resolveCollision(x, y, axis, dir, blocks) {
 }
 
 function isCollidingWithEnemies(x, y, enemies) {
-  return enemies.some(enemy => Math.abs(x - enemy.pos.x) < OBJECT_SIZE &&
-                                Math.abs(y - enemy.pos.y) < OBJECT_SIZE);
+  return enemies.some(enemy => Math.abs(x - enemy.pos.x) < OBJECT_SIZE - 2 * DIFF_OBJECT &&
+                                Math.abs(y - enemy.pos.y) < OBJECT_SIZE - 2 * DIFF_OBJECT);
+}
+
+function gcd(speed1, speed2) {
+  return speed2 === 0 ? speed1 : gcd(speed2, speed1 % speed2);
 }

@@ -1,6 +1,6 @@
 import { fadeIn, fadeOut } from "../util/fade.js";
 import { FONT_SIZES, FONT_STYLE, SCREEN_BOUNDS, SPACE } from "../util/fontsize.js";
-import { OBJECT_SIZE } from "./setting.js";
+import { OBJECT_SIZE, DIFF_OBJECT } from "./setting.js";
 import { generateInitialBoard } from "./randomGenerator.js";
 import { showBaseScreen } from "../util/baseScreen.js";
 import { countdown } from "./countdown.js";
@@ -94,7 +94,7 @@ let clearTime = 0;
 let isPaused = false;
 
 // ゲーム開始関数
-export async function startGame(ctx, canvas, playerName) {
+export async function startGame(ctx, canvas, playerName, boardData) {
   // 状態保持変数を初期化
   initGameVariables();
   startTime = null;
@@ -107,7 +107,6 @@ export async function startGame(ctx, canvas, playerName) {
   clearTime = 0;
 
   await loadImages(images);  // ここで全画像ロードを待つ
-  let boardData = generateInitialBoard();
   // フェードイン
   await fadeIn(ctx, canvas, 2500, () => drawGameBoard(ctx, canvas, boardData));
 
@@ -144,52 +143,52 @@ export function drawGameBoard(ctx, canvas, boardData) {
   });
 
   // ゴール描画
-  ctx.drawImage(goalImg, boardData.goal.pos.x, boardData.goal.pos.y, OBJECT_SIZE, OBJECT_SIZE);
+  ctx.drawImage(goalImg, boardData.goal.pos.x, boardData.goal.pos.y, OBJECT_SIZE - 2 * DIFF_OBJECT, OBJECT_SIZE - 2 * DIFF_OBJECT);
 
   // 鍵描画
   if (!gameState.isHoldingKeyItem) {
-    ctx.drawImage(keyImg, boardData.key.pos.x, boardData.key.pos.y, OBJECT_SIZE, OBJECT_SIZE);
+    ctx.drawImage(keyImg, boardData.key.pos.x, boardData.key.pos.y, OBJECT_SIZE - 2 * DIFF_OBJECT, OBJECT_SIZE - 2 * DIFF_OBJECT);
   }
   else {
     // 鍵を持っている場合、プレイヤーの近くに鍵を描画
-    ctx.drawImage(keyImg, boardData.player.pos.x + 5 * OBJECT_SIZE / 6, boardData.player.pos.y - OBJECT_SIZE / 6, OBJECT_SIZE / 3, OBJECT_SIZE / 3);
+    ctx.drawImage(keyImg, boardData.player.pos.x + (OBJECT_SIZE - 4 * DIFF_OBJECT), boardData.player.pos.y - OBJECT_SIZE / 6 - DIFF_OBJECT / 3, OBJECT_SIZE / 3, OBJECT_SIZE / 3);
   }
 
   // 敵描画
   boardData.enemies.forEach(enemy => {
     if (enemy.axis === 0) {
       if (enemy.dir === 0) {
-        ctx.drawImage(enemyLookRightImg, enemy.pos.x, enemy.pos.y, OBJECT_SIZE, OBJECT_SIZE);
+        ctx.drawImage(enemyLookRightImg, enemy.pos.x, enemy.pos.y, OBJECT_SIZE - 2 * DIFF_OBJECT, OBJECT_SIZE - 2 * DIFF_OBJECT);
       }
       else {
-        ctx.drawImage(enemyLookLeftImg, enemy.pos.x, enemy.pos.y, OBJECT_SIZE, OBJECT_SIZE);
+        ctx.drawImage(enemyLookLeftImg, enemy.pos.x, enemy.pos.y, OBJECT_SIZE - 2 * DIFF_OBJECT, OBJECT_SIZE - 2 * DIFF_OBJECT);
       }
     } else {
       if (enemy.dir === 0) {
-        ctx.drawImage(enemyLookDownImg, enemy.pos.x, enemy.pos.y, OBJECT_SIZE, OBJECT_SIZE);
+        ctx.drawImage(enemyLookDownImg, enemy.pos.x, enemy.pos.y, OBJECT_SIZE - 2 * DIFF_OBJECT, OBJECT_SIZE - 2 * DIFF_OBJECT);
       } else {
-        ctx.drawImage(enemyLookUpImg, enemy.pos.x, enemy.pos.y, OBJECT_SIZE, OBJECT_SIZE);
+        ctx.drawImage(enemyLookUpImg, enemy.pos.x, enemy.pos.y, OBJECT_SIZE - 2 * DIFF_OBJECT, OBJECT_SIZE - 2 * DIFF_OBJECT);
       }
     }
   });
 
   // プレイヤー描画
   if (gameState.isGameOver) {
-    ctx.drawImage(playerFailureImg, boardData.player.pos.x, boardData.player.pos.y, OBJECT_SIZE, OBJECT_SIZE);
+    ctx.drawImage(playerFailureImg, boardData.player.pos.x, boardData.player.pos.y, OBJECT_SIZE - 2 * DIFF_OBJECT, OBJECT_SIZE - 2 * DIFF_OBJECT);
   } else {
     if (lastKey === 'ArrowUp') {
-      ctx.drawImage(playerLookUpImg, boardData.player.pos.x, boardData.player.pos.y, OBJECT_SIZE, OBJECT_SIZE);
+      ctx.drawImage(playerLookUpImg, boardData.player.pos.x, boardData.player.pos.y, OBJECT_SIZE - 2 * DIFF_OBJECT, OBJECT_SIZE - 2 * DIFF_OBJECT);
     } else if (lastKey === 'ArrowDown') {
-      ctx.drawImage(playerLookDownImg, boardData.player.pos.x, boardData.player.pos.y, OBJECT_SIZE, OBJECT_SIZE);
+      ctx.drawImage(playerLookDownImg, boardData.player.pos.x, boardData.player.pos.y, OBJECT_SIZE - 2 * DIFF_OBJECT, OBJECT_SIZE - 2 * DIFF_OBJECT);
     } else if (lastKey === 'ArrowLeft') {
-      ctx.drawImage(playerLookLeftImg, boardData.player.pos.x, boardData.player.pos.y, OBJECT_SIZE, OBJECT_SIZE);
+      ctx.drawImage(playerLookLeftImg, boardData.player.pos.x, boardData.player.pos.y, OBJECT_SIZE - 2 * DIFF_OBJECT, OBJECT_SIZE - 2 * DIFF_OBJECT);
     } else if (lastKey === 'ArrowRight') {
-      ctx.drawImage(playerLookRightImg, boardData.player.pos.x, boardData.player.pos.y, OBJECT_SIZE, OBJECT_SIZE);
+      ctx.drawImage(playerLookRightImg, boardData.player.pos.x, boardData.player.pos.y, OBJECT_SIZE - 2 * DIFF_OBJECT, OBJECT_SIZE - 2 * DIFF_OBJECT);
     } else {
       if (boardData.player.pos.x >= drawW / 2) {
-        ctx.drawImage(playerLookLeftImg, boardData.player.pos.x, boardData.player.pos.y, OBJECT_SIZE, OBJECT_SIZE);
+        ctx.drawImage(playerLookLeftImg, boardData.player.pos.x, boardData.player.pos.y, OBJECT_SIZE - 2 * DIFF_OBJECT, OBJECT_SIZE - 2 * DIFF_OBJECT);
       } else {
-        ctx.drawImage(playerLookRightImg, boardData.player.pos.x, boardData.player.pos.y, OBJECT_SIZE, OBJECT_SIZE);
+        ctx.drawImage(playerLookRightImg, boardData.player.pos.x, boardData.player.pos.y, OBJECT_SIZE - 2 * DIFF_OBJECT, OBJECT_SIZE - 2 * DIFF_OBJECT);
       }
     }
   }
@@ -215,10 +214,14 @@ async function gameLoop(ctx, canvas, boardData, playerName) {
     }
     else if (responseFromPause === 'restart') {
       // リスタート
-      await fadeOut(ctx, canvas, 1000, 1000, () => {
+      const fadeOutPromise = fadeOut(ctx, canvas, 1000, 1000, () => {
         drawPauseScreen(ctx, canvas, boardData);
       });
-      startGame(ctx, canvas, playerName);
+      const initialBoardPromise = generateInitialBoard();
+
+      await fadeOutPromise;
+      boardData = await initialBoardPromise;
+      startGame(ctx, canvas, playerName, boardData);
     }
     else if (responseFromPause === 'quit') {
       // タイトルへ戻る
@@ -247,11 +250,12 @@ async function gameLoop(ctx, canvas, boardData, playerName) {
       clearTime = elapsedTime;
       clearFloor = currentFloor;
       pauseStartTime = performance.now();
-      await showHoldScreen(ctx, canvas, boardData, 1500, "STAGE CLEAR!");
+      const holdPromise = showHoldScreen(ctx, canvas, boardData, 1500, "STAGE CLEAR!");
+      boardData = generateInitialBoard();
+      await holdPromise;
 
       initGameVariables();
 
-      boardData = generateInitialBoard();
       pauseElapsedTime += performance.now() - pauseStartTime;
       elapsedTime = performance.now() - startTime - pauseElapsedTime;
       currentFloor += 1;
@@ -293,10 +297,14 @@ async function gameLoop(ctx, canvas, boardData, playerName) {
       
       const resultAction = await showResult(ctx, canvas, clearFloor, clearTimeAfterParse);
       if (resultAction === 'restart') {
-        await fadeOut(ctx, canvas, 1000, 1000, () => {
+        const fadeOutPromise = fadeOut(ctx, canvas, 1000, 1000, () => {
           drawResult(ctx, canvas, clearFloor, clearTimeAfterParse);
         });
-        startGame(ctx, canvas, playerName);
+        const initialBoardPromise = generateInitialBoard();
+
+        await fadeOutPromise;
+        boardData = await initialBoardPromise;
+        startGame(ctx, canvas, playerName, boardData);
       } else if (resultAction === 'title') {
         await fadeOut(ctx, canvas, 1000, 1000, () => {
           drawResult(ctx, canvas, clearFloor, clearTimeAfterParse);

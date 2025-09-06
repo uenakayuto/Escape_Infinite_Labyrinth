@@ -1,8 +1,11 @@
 import { SCREEN_BOUNDS } from "../util/fontsize.js";
-import { OBJECT_SIZE, QUANTITY_LIMIT, PLAYER_SPEED } from "./setting.js";
+import { OBJECT_SIZE, QUANTITY_LIMIT, PLAYER_SPEED, DIFF_OBJECT } from "./setting.js";
 import { clearCheck } from "./clearCheck.js";
 
 const { drawW, drawH } = SCREEN_BOUNDS;
+
+const cols = Math.floor(drawW / OBJECT_SIZE) - 2;
+const rows = Math.floor(drawH / OBJECT_SIZE) - 2;
 
 export function generateInitialBoard() {
 
@@ -67,9 +70,6 @@ export function generateInitialBoard() {
   }
 
   function getRandomPosition() {
-    const cols = Math.floor(drawW / OBJECT_SIZE) - 2;
-    const rows = Math.floor(drawH / OBJECT_SIZE) - 2;
-
     const xIndex = Math.floor(Math.random() * cols) + 1;
     const yIndex = Math.floor(Math.random() * rows) + 1;
 
@@ -121,7 +121,7 @@ export function generateInitialBoard() {
         dir = Math.floor(Math.random() * 2); // 0: 右/下, 1: 左/上
       } while (!canPlaceEnemy(pos.x, pos.y, axis, player, keyItem, goal, blocks));
 
-      const speed = Math.floor(Math.random() * 5) + 2;
+      const speed = Math.floor(Math.random() * (PLAYER_SPEED - 1)) + 2;
 
       enemies.push({ pos, axis, dir, speed });
       countX.enemy[pos.x] = (countX.enemy[pos.x] || 0) + 1;
@@ -138,6 +138,19 @@ export function generateInitialBoard() {
 
     // --- 7. clearCheck ---
     if (clearCheck(board)) {
+      board.player.pos.x += DIFF_OBJECT;
+      board.player.pos.y += DIFF_OBJECT;
+      board.key.pos.x += DIFF_OBJECT;
+      board.key.pos.y += DIFF_OBJECT;
+      board.goal.pos.x += DIFF_OBJECT;
+      board.goal.pos.y += DIFF_OBJECT;
+      board.enemies = board.enemies.map(enemy => ({
+        ...enemy,
+        pos: {
+          x: enemy.pos.x + DIFF_OBJECT,
+          y: enemy.pos.y + DIFF_OBJECT
+        }
+      }));
       return board;
     }
     // 失敗なら while でやり直し
