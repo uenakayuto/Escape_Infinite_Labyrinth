@@ -1,6 +1,7 @@
 import { showBaseScreen } from "../util/baseScreen.js";
 import { SCREEN_BOUNDS, FONT_SIZES, FONT_STYLE, SPACE } from "../util/fontsize.js";
 import { COLORS } from "../util/color.js";
+import { menuSelectSE } from "../main.js";
 
 const { drawW, drawH } = SCREEN_BOUNDS;
 
@@ -9,6 +10,8 @@ export function showRecords(ctx, canvas, records) {
         drawRecords(ctx, canvas, records);
         function onKeyDown(e) {
             if (e.key === "Enter") {
+                menuSelectSE.currentTime = 0;
+                menuSelectSE.play();
                 window.removeEventListener("keydown", onKeyDown);
                 resolve();
             }

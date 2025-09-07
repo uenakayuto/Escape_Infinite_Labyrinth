@@ -2,6 +2,12 @@ import { SCREEN_BOUNDS } from "../util/fontsize.js";
 import { OBJECT_SIZE, DIFF_OBJECT } from "./setting.js";
 import { gameState } from "./game.js";
 
+const getKeyItemSE = new Audio('./resource/se/get_key.ogg');
+
+const goalSE = new Audio('./resource/se/goal.ogg');
+
+const gameOverSE = new Audio('./resource/se/game_over.ogg');
+
 const { drawW, drawH } = SCREEN_BOUNDS;
 
 export function gameLogic(board, pressedKeys) {
@@ -163,6 +169,8 @@ export function gameLogic(board, pressedKeys) {
     if (Math.abs(player.pos.x - keyItem.pos.x) < OBJECT_SIZE - 2 * DIFF_OBJECT &&
         Math.abs(player.pos.y - keyItem.pos.y) < OBJECT_SIZE - 2 * DIFF_OBJECT) {
       gameState.isHoldingKeyItem = true;
+      getKeyItemSE.currentTime = 0;
+      getKeyItemSE.play();
     }
   }
 
@@ -170,12 +178,16 @@ export function gameLogic(board, pressedKeys) {
     if (Math.abs(player.pos.x - goal.pos.x) < OBJECT_SIZE - 2 * DIFF_OBJECT &&
         Math.abs(player.pos.y - goal.pos.y) < OBJECT_SIZE - 2 * DIFF_OBJECT) {
       gameState.isGoal = true;
+      goalSE.currentTime = 0;
+      goalSE.play();
     }
   }
 
   if (!gameState.isGoal){
     if (isCollidingWithEnemies(player.pos.x, player.pos.y, newEnemies)) {
       gameState.isGameOver = true;
+      gameOverSE.currentTime = 0;
+      gameOverSE.play();
     }
   }
 

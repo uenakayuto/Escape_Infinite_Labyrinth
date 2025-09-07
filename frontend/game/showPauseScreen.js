@@ -1,6 +1,7 @@
 import { drawGameBoard } from "./game.js";
 import { SCREEN_BOUNDS, FONT_SIZES, FONT_STYLE, SPACE } from "../util/fontsize.js";
 import { COLORS } from "../util/color.js";
+import { cousorSE } from "../main.js";
 
 const { drawW, drawH } = SCREEN_BOUNDS;
 
@@ -20,11 +21,15 @@ export function showPauseScreen(ctx, canvas, boardData) {
 
     function onKeyDown(e) {
       if (e.key === "ArrowUp") {
+        cousorSE.currentTime = 0;
+        cousorSE.play();
         selectedPauseMenuIndex =
           (selectedPauseMenuIndex - 1 + pauseMenuItems.length) %
           pauseMenuItems.length;
         drawPauseScreen(ctx, canvas, boardData);
       } else if (e.key === "ArrowDown") {
+        cousorSE.currentTime = 0;
+        cousorSE.play();
         selectedPauseMenuIndex =
           (selectedPauseMenuIndex + 1) % pauseMenuItems.length;
         drawPauseScreen(ctx, canvas, boardData);

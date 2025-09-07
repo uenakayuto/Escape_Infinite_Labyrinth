@@ -9,46 +9,52 @@ import { showHoldScreen, drawScreenToHold } from "./showHoldScreen.js";
 import { showResult } from "../result/result.js";
 import { COLORS } from "../util/color.js";
 import { showPauseScreen, drawPauseScreen } from "./showPauseScreen.js";
-import { startTitle, API_BASE_URL } from "../main.js";
+import { startTitle, API_BASE_URL, menuSelectSE } from "../main.js";
 import { drawResult } from "../result/result.js";
 
 const { drawW, drawH } = SCREEN_BOUNDS;
 
 const blockImg = new Image();
-blockImg.src = './resource/img/block.png';
+blockImg.src = './resource/img/object/block.png';
 
 const playerLookLeftImg = new Image();
-playerLookLeftImg.src = './resource/img/player_look_left.png';
+playerLookLeftImg.src = './resource/img/object/player_look_left.png';
 
 const playerLookRightImg = new Image();
-playerLookRightImg.src = './resource/img/player_look_right.png';
+playerLookRightImg.src = './resource/img/object/player_look_right.png';
 
 const playerLookUpImg = new Image();
-playerLookUpImg.src = './resource/img/player_look_up.png';
+playerLookUpImg.src = './resource/img/object/player_look_up.png';
 
 const playerLookDownImg = new Image();
-playerLookDownImg.src = './resource/img/player_look_down.png';
+playerLookDownImg.src = './resource/img/object/player_look_down.png';
 
 const playerFailureImg = new Image();
-playerFailureImg.src = './resource/img/player_failure.png';
+playerFailureImg.src = './resource/img/object/player_failure.png';
 
 const keyImg = new Image();
-keyImg.src = './resource/img/key.png';
+keyImg.src = './resource/img/object/key.png';
 
 const goalImg = new Image();
-goalImg.src = './resource/img/goal.png';
+goalImg.src = './resource/img/object/goal.png';
 
 const enemyLookLeftImg = new Image();
-enemyLookLeftImg.src = './resource/img/enemy_look_left.png';
+enemyLookLeftImg.src = './resource/img/object/enemy_look_left.png';
 
 const enemyLookRightImg = new Image();
-enemyLookRightImg.src = './resource/img/enemy_look_right.png';
+enemyLookRightImg.src = './resource/img/object/enemy_look_right.png';
 
 const enemyLookUpImg = new Image();
-enemyLookUpImg.src = './resource/img/enemy_look_up.png';
+enemyLookUpImg.src = './resource/img/object/enemy_look_up.png';
 
 const enemyLookDownImg = new Image();
-enemyLookDownImg.src = './resource/img/enemy_look_down.png';
+enemyLookDownImg.src = './resource/img/object/enemy_look_down.png';
+
+const fadeInGameSE = new Audio('./resource/se/fade_in_game.ogg');
+
+const gameStartGameSE = new Audio('./resource/se/game_start_game.ogg');
+
+const getKeyItemSE = new Audio('./resource/se/get_key.ogg');
 
 // 全画像を配列にまとめる
 const images = [
@@ -108,10 +114,14 @@ export async function startGame(ctx, canvas, playerName, boardData) {
 
   await loadImages(images);  // ここで全画像ロードを待つ
   // フェードイン
+  fadeInGameSE.currentTime = 0;
+  fadeInGameSE.play();
   await fadeIn(ctx, canvas, 2500, () => drawGameBoard(ctx, canvas, boardData));
 
   // カウントダウン
   await countdown(ctx, canvas, boardData);
+  gameStartGameSE.currentTime = 0;
+  gameStartGameSE.play();
 
   document.addEventListener('keydown', handleGameKeyDown);
   document.addEventListener('keyup', handleGameKeyUp);
@@ -201,12 +211,16 @@ async function gameLoop(ctx, canvas, boardData, playerName) {
 
   if (isPaused) {
     // 一時停止中の処理
+    getKeyItemSE.currentTime = 0;
+    getKeyItemSE.play();
     document.removeEventListener('keydown', handleGameKeyDown);
     document.removeEventListener('keyup', handleGameKeyUp);
     pauseStartTime = performance.now();
     const responseFromPause = await showPauseScreen(ctx, canvas, boardData);
     if (responseFromPause === 'resume') {
       isPaused = false;
+      getKeyItemSE.currentTime = 0;
+      getKeyItemSE.play();
       document.addEventListener('keydown', handleGameKeyDown);
       document.addEventListener('keyup', handleGameKeyUp);
       pauseElapsedTime += performance.now() - pauseStartTime;
@@ -214,6 +228,8 @@ async function gameLoop(ctx, canvas, boardData, playerName) {
     }
     else if (responseFromPause === 'restart') {
       // リスタート
+      getKeyItemSE.currentTime = 0;
+      getKeyItemSE.play();
       const fadeOutPromise = fadeOut(ctx, canvas, 1000, 1000, () => {
         drawPauseScreen(ctx, canvas, boardData);
       });
@@ -225,6 +241,8 @@ async function gameLoop(ctx, canvas, boardData, playerName) {
     }
     else if (responseFromPause === 'quit') {
       // タイトルへ戻る
+      getKeyItemSE.currentTime = 0;
+      getKeyItemSE.play();
       await fadeOut(ctx, canvas, 1000, 1000, () => {
         drawPauseScreen(ctx, canvas, boardData);
       });
@@ -295,8 +313,13 @@ async function gameLoop(ctx, canvas, boardData, playerName) {
         drawScreenToHold(ctx, canvas, boardData, "GAME OVER");
       });
       
+      getKeyItemSE.currentTime = 0;
+      getKeyItemSE.play();
+      // リザルト画面へ
       const resultAction = await showResult(ctx, canvas, clearFloor, clearTimeAfterParse);
       if (resultAction === 'restart') {
+        menuSelectSE.currentTime = 0;
+        menuSelectSE.play();
         const fadeOutPromise = fadeOut(ctx, canvas, 1000, 1000, () => {
           drawResult(ctx, canvas, clearFloor, clearTimeAfterParse);
         });
@@ -306,6 +329,8 @@ async function gameLoop(ctx, canvas, boardData, playerName) {
         boardData = await initialBoardPromise;
         startGame(ctx, canvas, playerName, boardData);
       } else if (resultAction === 'title') {
+        menuSelectSE.currentTime = 0;
+        menuSelectSE.play();
         await fadeOut(ctx, canvas, 1000, 1000, () => {
           drawResult(ctx, canvas, clearFloor, clearTimeAfterParse);
         });

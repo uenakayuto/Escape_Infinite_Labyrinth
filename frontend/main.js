@@ -20,7 +20,15 @@ canvas.width = SCREEN_BOUNDS.drawW;
 canvas.height = SCREEN_BOUNDS.drawH;
 
 let bgImage = new Image();
-bgImage.src = 'resource/img/title_screen.png';
+bgImage.src = './resource/img/title_screen.png';
+
+export const cousorSE = new Audio('./resource/se/cursor.ogg')
+
+export const selectCreditsSE = new Audio('./resource/se/select_credits.ogg')
+
+const gameStartSE = new Audio('./resource/se/game_start.ogg')
+
+export const menuSelectSE = new Audio('./resource/se/menu_select.ogg')
 
 // ▼ 選択中メニューを保持（0=ゲームスタート, 1=遊び方, 2=ランキング）
 let selectedTitleMenuIndex = 0;
@@ -52,16 +60,22 @@ document.body.appendChild(nameInput);
 async function handleTitleKeys(e) {
   if (!isNameInputActive) {
   if (e.key === 'ArrowUp') {
+      cousorSE.currentTime = 0;
+      cousorSE.play();
       selectedTitleMenuIndex = (selectedTitleMenuIndex - 1 + titleMenuItems.length) % titleMenuItems.length;
       drawTitle();
     }
     else if (e.key === 'ArrowDown') {
+      cousorSE.currentTime = 0;
+      cousorSE.play();
       selectedTitleMenuIndex = (selectedTitleMenuIndex + 1) % titleMenuItems.length;
       drawTitle();
     }
     else if (e.key === 'c') {
       // クレジット画面へ遷移
       cleanupTitle();
+      selectCreditsSE.currentTime = 0;
+      selectCreditsSE.play();
       await fadeOut(ctx, canvas, 1000, 1000, () => {
         drawTitle();
       });
@@ -72,6 +86,8 @@ async function handleTitleKeys(e) {
       // メニューに応じて遷移
       cleanupTitle();
       if (selectedTitleMenuIndex === 0) {
+        gameStartSE.currentTime = 0;
+        gameStartSE.play();
         const fadeOutPromise = fadeOut(ctx, canvas, 1000, 1000, () => {
           drawTitle();
         });
@@ -81,11 +97,15 @@ async function handleTitleKeys(e) {
         const boardData = await initialBoardPromise;
         startGame(ctx, canvas, playerName, boardData);
       } else if (selectedTitleMenuIndex === 1) {
+        menuSelectSE.currentTime = 0;
+        menuSelectSE.play();
         await fadeOut(ctx, canvas, 1000, 1000, () => {
           drawTitle();
         });
         showHowToPlay(ctx, canvas);
       } else if (selectedTitleMenuIndex === 2) {
+        menuSelectSE.currentTime = 0;
+        menuSelectSE.play();
         try {
           const fadeOutPromise = fadeOut(ctx, canvas, 1000, 1000, () => {
             drawTitle();
@@ -148,6 +168,8 @@ function handleCanvasClick(e) {
     mouseY >= boxY &&
     mouseY <= boxY + boxHeight
   ) {
+    selectCreditsSE.currentTime = 0;
+    selectCreditsSE.play();
     isNameInputActive = true;
     nameInput.focus(); // IME入力開始
   } else {

@@ -1,6 +1,7 @@
 import { showBaseScreen } from "../util/baseScreen.js";
 import { SCREEN_BOUNDS, FONT_SIZES, FONT_STYLE, SPACE } from "../util/fontsize.js";
 import { COLORS } from "../util/color.js";
+import { cousorSE } from "../main.js";
 
 const { drawW, drawH } = SCREEN_BOUNDS;
 
@@ -19,11 +20,15 @@ export function showResult(ctx, canvas, floor, time) {
 
         function onKeyDown(e) {
             if (e.key === "ArrowUp") {
+                cousorSE.currentTime = 0;
+                cousorSE.play();
                 selectedResultMenuIndex =
                     (selectedResultMenuIndex - 1 + resultMenuItems.length) %
                     resultMenuItems.length;
                 drawResult(ctx, canvas, floor, time);
             } else if (e.key === "ArrowDown") {
+                cousorSE.currentTime = 0;
+                cousorSE.play();
                 selectedResultMenuIndex =
                     (selectedResultMenuIndex + 1) % resultMenuItems.length;
                 drawResult(ctx, canvas, floor, time);

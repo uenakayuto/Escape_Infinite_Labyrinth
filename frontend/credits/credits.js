@@ -2,6 +2,7 @@ import { COLORS } from "../util/color.js";
 import { FONT_SIZES, FONT_STYLE, SCREEN_BOUNDS } from "../util/fontsize.js";
 import { showBaseScreen } from "../util/baseScreen.js";
 import { fadeOut } from "../util/fade.js";
+import { selectCreditsSE } from "../main.js";
 
 let scrollY = 0;
 let maxScrollY = 0;
@@ -39,6 +40,8 @@ export function showCredits(ctx, canvas) {
     function handleKeyDown(e) {
       if (e.key === "Enter") {
         cleanup();
+        selectCreditsSE.currentTime = 0;
+        selectCreditsSE.play();
         fadeOut(ctxRef, canvasRef, 1000, 1000, () => {
           renderCreditsFrame(); // フェード中に呼ばれる
         }).then(() => {
