@@ -52,7 +52,7 @@ export function showPauseScreen(ctx, canvas, boardData) {
 export function drawPauseScreen(ctx, canvas, boardData) {
 
   // 背景を描画
-  drawGameBoard(ctx, canvas, boardData);
+  drawGameBoard(ctx, boardData);
 
   // 画面全体を少し暗くする（透明な黒を重ねる）
   ctx.fillStyle = "rgba(0, 0, 0, 0.5)"; // 50%透明の黒

@@ -49,7 +49,7 @@ export function showResult(ctx, canvas, floor, time) {
 }
 
 export function drawResult(ctx, canvas, floor, time) {
-  showBaseScreen(ctx, canvas);
+  showBaseScreen(ctx);
 
   ctx.font = `bold ${FONT_SIZES.title}px ${FONT_STYLE.fontStyle}`;
   ctx.textAlign = "center";

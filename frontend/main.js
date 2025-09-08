@@ -6,6 +6,7 @@ import { generateInitialBoard } from "./game/randomGenerator.js";
 import { showHowToPlay } from "./howToPlay/howToPlay.js";
 import { showRecords, drawRecords } from "./record/record.js";
 import { showCredits } from "./credits/credits.js";
+import { showBaseScreen } from "./util/baseScreen.js";
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -22,13 +23,17 @@ canvas.height = SCREEN_BOUNDS.drawH;
 let bgImage = new Image();
 bgImage.src = './resource/img/title_screen.png';
 
-export const cousorSE = new Audio('./resource/se/cursor.ogg')
+export const cousorSE = new Audio('./resource/se/cursor.ogg');
 
-export const selectCreditsSE = new Audio('./resource/se/select_credits.ogg')
+export const selectCreditsSE = new Audio('./resource/se/select_credits.ogg');
+selectCreditsSE.volume = 0.8;
 
-const gameStartSE = new Audio('./resource/se/game_start.ogg')
+const gameStartSE = new Audio('./resource/se/game_start.ogg');
 
-export const menuSelectSE = new Audio('./resource/se/menu_select.ogg')
+export const menuSelectSE = new Audio('./resource/se/menu_select.ogg');
+
+export const titleBgm = new Audio('./resource/bgm/title.ogg');
+titleBgm.loop = true;
 
 // ▼ 選択中メニューを保持（0=ゲームスタート, 1=遊び方, 2=ランキング）
 let selectedTitleMenuIndex = 0;
@@ -78,7 +83,7 @@ async function handleTitleKeys(e) {
       selectCreditsSE.play();
       await fadeOut(ctx, canvas, 1000, 1000, () => {
         drawTitle();
-      });
+      }, true, titleBgm);
       await showCredits(ctx, canvas);
       startTitle();
     }
@@ -90,7 +95,7 @@ async function handleTitleKeys(e) {
         gameStartSE.play();
         const fadeOutPromise = fadeOut(ctx, canvas, 1000, 1000, () => {
           drawTitle();
-        });
+        }, true, titleBgm);
         const initialBoardPromise = generateInitialBoard();
 
         await fadeOutPromise;
@@ -102,7 +107,8 @@ async function handleTitleKeys(e) {
         await fadeOut(ctx, canvas, 1000, 1000, () => {
           drawTitle();
         });
-        showHowToPlay(ctx, canvas);
+        await showHowToPlay(ctx, canvas);
+        startTitle();
       } else if (selectedTitleMenuIndex === 2) {
         menuSelectSE.currentTime = 0;
         menuSelectSE.play();
@@ -142,6 +148,12 @@ export function startTitle() {
   nameInput.addEventListener("input", handleNameInput);
 
   bgImage.onload = () => drawTitle();
+
+  if (titleBgm.paused) {
+    titleBgm.volume = 1.0;
+    titleBgm.currentTime = 0;
+    titleBgm.play();
+  }
 }
 
 const boxPadding = SPACE.paddingNameBox;
@@ -316,3 +328,32 @@ function resizeCanvas() {
 
 window.addEventListener("resize", resizeCanvas);
 window.addEventListener("load", resizeCanvas);
+
+export function showFirstScreen() {
+    drawFirstScreen();
+    document.addEventListener('keydown', handleFirstScreenKeys);
+}
+
+function drawFirstScreen() {
+  showBaseScreen(ctx);
+  ctx.font = `bold ${FONT_SIZES.title}px ${FONT_STYLE.fontStyle}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineWidth = FONT_SIZES.lineWidth;
+  ctx.strokeStyle = COLORS.border;
+  ctx.strokeText("Escape Infinite Labyrinth", SCREEN_BOUNDS.drawW / 2, SCREEN_BOUNDS.drawH / 4);
+  ctx.fillStyle = COLORS.whiteText;
+  ctx.fillText("Escape Infinite Labyrinth", SCREEN_BOUNDS.drawW / 2, SCREEN_BOUNDS.drawH / 4);
+
+  ctx.font = `${FONT_SIZES.creditSubtitle}px ${FONT_STYLE.fontStyle}`;
+  ctx.strokeText("Press Enter to Start", SCREEN_BOUNDS.drawW / 2, SCREEN_BOUNDS.drawH * 3 / 4);
+  ctx.fillStyle = COLORS.whiteText;
+  ctx.fillText("Press Enter to Start", SCREEN_BOUNDS.drawW / 2, SCREEN_BOUNDS.drawH * 3 / 4);
+}
+
+function handleFirstScreenKeys(e) {
+  if (e.key === "Enter") {
+    document.removeEventListener('keydown', handleFirstScreenKeys);
+    startTitle();
+  }
+}

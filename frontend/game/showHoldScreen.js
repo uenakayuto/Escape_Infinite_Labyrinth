@@ -17,7 +17,7 @@ export function showHoldScreen(ctx, canvas, boardData, hold, message) {
 
 export function drawScreenToHold(ctx, canvas, boardData, message) {
   // 背景（盤面など）を描画
-  drawGameBoard(ctx, canvas, boardData);
+  drawGameBoard(ctx, boardData);
 
   // テキスト描画
   const text = message;

@@ -21,7 +21,8 @@ export const SPACE = {
   menuSpacing: 48 * 1.5,
   paddingNameBox: 20,
   paddingCreditsBottomOnTitle: 10,
-  paddingTimeAndFloor: 12
+  paddingTimeAndFloor: 12,
+  imageSpacing: 20
 }
 
 export const SCREEN_BOUNDS = {

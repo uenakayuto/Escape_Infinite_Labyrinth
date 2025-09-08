@@ -80,7 +80,7 @@ function renderCreditsFrame() {
   const ctx = ctxRef;
   const canvas = canvasRef;
 
-  showBaseScreen(ctx, canvas);
+  showBaseScreen(ctx);
 
   ctx.textAlign = "center";
   ctx.textBaseline = "top";

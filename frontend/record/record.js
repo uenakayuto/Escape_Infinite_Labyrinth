@@ -21,7 +21,7 @@ export function showRecords(ctx, canvas, records) {
 }
 
 export function drawRecords(ctx, canvas, records) {
-    showBaseScreen(ctx, canvas);
+    showBaseScreen(ctx);
     ctx.font = `bold ${FONT_SIZES.title}px ${FONT_STYLE.fontStyle}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
