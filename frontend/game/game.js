@@ -407,7 +407,7 @@ function drawElapsedTimeAndFloor(ctx, elapsed, currentFloor) {
 }
 
 function parseTime(elapsed) {
-  const totalMs = elapsed;
+  const totalMs = Math.floor(elapsed);
   const minutes = Math.floor(totalMs / 60000);
   const seconds = Math.floor((totalMs % 60000) / 1000);
   const milliseconds = totalMs % 1000;
