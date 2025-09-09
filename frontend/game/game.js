@@ -9,7 +9,7 @@ import { showHoldScreen, drawScreenToHold } from "./showHoldScreen.js";
 import { showResult } from "../result/result.js";
 import { COLORS } from "../util/color.js";
 import { showPauseScreen, drawPauseScreen } from "./showPauseScreen.js";
-import { startTitle, API_BASE_URL, menuSelectSE } from "../main.js";
+import { startTitle, menuSelectSE } from "../main.js";
 import { drawResult } from "../result/result.js";
 
 const { drawW, drawH } = SCREEN_BOUNDS;
@@ -301,7 +301,7 @@ async function gameLoop(ctx, canvas, boardData, playerName) {
       const date = new Date().toISOString();
 
       if (playerName !== "") {
-        fetch(`${API_BASE_URL}/api/register`, {
+        fetch("/api/registerRecord", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -313,7 +313,10 @@ async function gameLoop(ctx, canvas, boardData, playerName) {
             clearTimeAfterParse,
             date
           })
-        }).catch(err => console.error("登録エラー:", err));
+        })
+          .then(res => res.json())
+          .then(data => console.log("登録成功:", data))
+          .catch(err => console.error("登録エラー:", err));
       }
 
       await showHoldScreen(ctx, canvas, boardData, 1000, "GAME OVER");

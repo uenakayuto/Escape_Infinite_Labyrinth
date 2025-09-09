@@ -11,12 +11,6 @@ import { showBaseScreen } from "./util/baseScreen.js";
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-// main.js
-const isLocal = location.hostname === "127.0.0.1";
-export const API_BASE_URL = isLocal
-  ? "http://localhost:3000"   // 開発時
-  : "https://example.com";    // デプロイ後
-
 canvas.width = SCREEN_BOUNDS.drawW;
 canvas.height = SCREEN_BOUNDS.drawH;
 
@@ -117,7 +111,7 @@ async function handleTitleKeys(e) {
             drawTitle();
           });
 
-          const fetchPromise = fetch(`${API_BASE_URL}/api/fetch`).then(res => res.json());
+          const fetchPromise = fetch("/api/fetchRecord").then(res => res.json());
 
           await fadeOutPromise;
           const records = await fetchPromise;
