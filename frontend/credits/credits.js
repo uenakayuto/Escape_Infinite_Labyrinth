@@ -26,7 +26,7 @@ const creditsData = [
     { type: "name", text: "Bfxr" },
     { type: "subtitle", text: "Special Thanks" },
     { type: "name", text: "ChatGPT" },
-    { type: "name", text: "You" },
+    { type: "name", text: "プレイしてくれた全ての方々" },
 ];
 
 let canvasRef, ctxRef;
