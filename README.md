@@ -2,6 +2,7 @@
 
 ## ゲーム URL
 [https://escape-infinite-labyrinth.vercel.app/](https://escape-infinite-labyrinth.vercel.app/)  
+(**PCのみ対応)
 
 ---
 
