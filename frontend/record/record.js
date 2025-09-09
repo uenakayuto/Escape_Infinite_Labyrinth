@@ -48,9 +48,9 @@ export function drawRecords(ctx, canvas, records) {
         const y = subtitleY + (i + 1) * SPACE.menuSpacing;
         const record = records[i];
 
-        const playerName = record ? record.playerName : "--------";
-        const clearFloor = record ? `${record.clearFloor} F` : "----";
-        const clearTimeAfterParse = record ? record.clearTimeAfterParse : "--: --. ---";
+        const playerName = record ? record.playername : "--------";
+        const clearFloor = record ? `${record.clearfloor} F` : "----";
+        const clearTimeAfterParse = record ? record.cleartimeafterparse : "--: --. ---";
 
         if (i === 0) {
             ctx.fillStyle = COLORS.gold;

@@ -13,7 +13,13 @@ export default async function handler(req, res) {
 
   // 1. 新しいスコアを挿入
   const { error: insertError } = await supabase.from("scores").insert([
-    { playerName, clearFloor, clearTime, clearTimeAfterParse, date }
+    {
+      playername: playerName,
+      clearfloor: clearFloor,
+      cleartime: clearTime,
+      cleartimeafterparse: clearTimeAfterParse,
+      date,
+    }
   ]);
 
   if (insertError) {
@@ -24,8 +30,8 @@ export default async function handler(req, res) {
   const { data: rows, error: selectError } = await supabase
     .from("scores")
     .select("*")
-    .order("clearFloor", { ascending: false })
-    .order("clearTime", { ascending: true })
+    .order("clearfloor", { ascending: false })
+    .order("cleartime", { ascending: true })
     .order("date", { ascending: true });
 
   if (selectError) {

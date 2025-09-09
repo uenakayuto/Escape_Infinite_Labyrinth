@@ -7,9 +7,9 @@ export default async function handler(req, res) {
 
   const { data, error } = await supabase
     .from("scores")
-    .select("playerName, clearFloor, clearTimeAfterParse")
-    .order("clearFloor", { ascending: false })
-    .order("clearTime", { ascending: true })
+    .select("playername, clearfloor, cleartimeafterparse")
+    .order("clearfloor", { ascending: false })
+    .order("cleartime", { ascending: true })
     .order("date", { ascending: true })
     .limit(5);
 
