@@ -297,6 +297,7 @@ async function gameLoop(ctx, canvas, boardData, playerName) {
       document.removeEventListener('keyup', handleGameKeyUp);
 
       elapsedTime = performance.now() - startTime - pauseElapsedTime;
+      clearTime = Math.floor(clearTime);
       const clearTimeAfterParse = parseTime(clearTime);
       const date = new Date().toISOString();
 
@@ -406,7 +407,7 @@ function drawElapsedTimeAndFloor(ctx, elapsed, currentFloor) {
 }
 
 function parseTime(elapsed) {
-  const totalMs = Math.floor(elapsed);
+  const totalMs = elapsed;
   const minutes = Math.floor(totalMs / 60000);
   const seconds = Math.floor((totalMs % 60000) / 1000);
   const milliseconds = totalMs % 1000;
