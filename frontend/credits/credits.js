@@ -112,7 +112,7 @@ function renderCreditsFrame() {
       if (creditsData[index + 1]?.type === "subtitle") {
         y += FONT_SIZES.creditSubtitle * 1.75;
       } else {
-        y += FONT_SIZES.menu * 1;
+        y += FONT_SIZES.menu * 1.25;
       }
     }
   });
