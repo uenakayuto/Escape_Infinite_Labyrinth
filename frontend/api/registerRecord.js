@@ -23,6 +23,7 @@ export default async function handler(req, res) {
   ]);
 
   if (insertError) {
+    console.error("Insert error:", insertError);
     return res.status(500).json({ error: insertError.message });
   }
 
