@@ -357,4 +357,3 @@ function handleFirstScreenKeys(e) {
     startTitle();
   }
 }
-
