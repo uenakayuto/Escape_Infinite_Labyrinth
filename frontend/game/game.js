@@ -297,6 +297,7 @@ async function gameLoop(ctx, canvas, boardData, playerName) {
       document.removeEventListener('keyup', handleGameKeyUp);
 
       elapsedTime = performance.now() - startTime - pauseElapsedTime;
+      clearTime = Math.floor(clearTime);
       const clearTimeAfterParse = parseTime(clearTime);
       const date = new Date().toISOString();
 
