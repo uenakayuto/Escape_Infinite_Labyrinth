@@ -353,11 +353,46 @@ async function gameLoop(ctx, canvas, boardData, playerName) {
 // keydown
 function handleGameKeyDown(e) {
   switch (e.key) {
-    case 'ArrowUp': pressedKeys.up = true; lastKey = 'ArrowUp'; break;
-    case 'ArrowDown': pressedKeys.down = true; lastKey = 'ArrowDown'; break;
-    case 'ArrowLeft': pressedKeys.left = true; lastKey = 'ArrowLeft'; break;
-    case 'ArrowRight': pressedKeys.right = true; lastKey = 'ArrowRight'; break;
-    case 'Escape': isPaused = true; break;
+    case 'Escape': {
+      isPaused = true;
+      pressedKeys.right = false;
+      pressedKeys.left = false;
+      pressedKeys.down = false;
+      pressedKeys.up = false;
+      break;
+    }
+    case 'ArrowRight': {
+      pressedKeys.right = true;
+      lastKey = 'ArrowRight';
+      pressedKeys.left = false;
+      pressedKeys.down = false;
+      pressedKeys.up = false;
+      break;
+    }
+    case 'ArrowLeft': {
+      pressedKeys.left = true;
+      lastKey = 'ArrowLeft';
+      pressedKeys.right = false;
+      pressedKeys.down = false;
+      pressedKeys.up = false;
+      break;
+    }
+    case 'ArrowDown': {
+      pressedKeys.down = true;
+      lastKey = 'ArrowDown';
+      pressedKeys.right = false;
+      pressedKeys.left = false;
+      pressedKeys.up = false;
+      break;
+    }
+    case 'ArrowUp': {
+      pressedKeys.up = true;
+      lastKey = 'ArrowUp';
+      pressedKeys.right = false;
+      pressedKeys.left = false;
+      pressedKeys.down = false;
+      break;
+    }
   }
 }
 
