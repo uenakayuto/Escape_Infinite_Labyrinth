@@ -344,8 +344,8 @@ function drawFirstScreen() {
   ctx.fillText("Press Enter to Start", SCREEN_BOUNDS.drawW / 2, SCREEN_BOUNDS.drawH * 3 / 4);
 
   ctx.font = `${FONT_SIZES.menu}px ${FONT_STYLE.fontStyle}`;
-  ctx.strokeText("(※音が出るので注意)", SCREEN_BOUNDS.drawW / 2, SCREEN_BOUNDS.drawH * 3 / 4 + 1.5 * FONT_SIZES.creditSubtitle);
-  ctx.fillText("(※音が出るので注意)", SCREEN_BOUNDS.drawW / 2, SCREEN_BOUNDS.drawH * 3 / 4 + 1.5 * FONT_SIZES.creditSubtitle);
+  ctx.strokeText("(※音が出るので注意)", SCREEN_BOUNDS.drawW / 2, SCREEN_BOUNDS.drawH * 3 / 4 + FONT_SIZES.creditSubtitle);
+  ctx.fillText("(※音が出るので注意)", SCREEN_BOUNDS.drawW / 2, SCREEN_BOUNDS.drawH * 3 / 4 + FONT_SIZES.creditSubtitle);
 }
 
 function handleFirstScreenKeys(e) {
