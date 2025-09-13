@@ -1,4 +1,4 @@
-import { drawGameBoard } from "./game.js"; // 既存関数
+import { drawGameBoard } from "./game.js";
 import { FONT_SIZES, FONT_STYLE, SCREEN_BOUNDS } from "../util/fontsize.js";
 import { COLORS } from "../util/color.js";
 
@@ -13,7 +13,7 @@ export function countdown(ctx, canvas, boardData) {
 
     function drawNumber() {
       if (index < numbers.length) {
-        drawGameBoard(ctx, boardData); // 背景描画
+        drawGameBoard(ctx, boardData);
 
         // 数字を中央に描画
         const number = numbers[index];

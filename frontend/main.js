@@ -32,7 +32,7 @@ titleBgm.loop = true;
 // ▼ 選択中メニューを保持（0=ゲームスタート, 1=遊び方, 2=ランキング）
 let selectedTitleMenuIndex = 0;
 
-// ▼ メニュー項目配列（位置計算のため）
+// ▼ メニュー項目配列
 const titleMenuItems = [
   { label: "ゲームスタート" },
   { label: "遊び方" },
@@ -46,8 +46,8 @@ const nameInput = document.createElement("input");
 nameInput.type = "text";
 nameInput.maxLength = 12;
 nameInput.style.opacity = 0;
-nameInput.style.pointerEvents = "none"; // クリック無効
-nameInput.style.position = "fixed"; // fixed にする
+nameInput.style.pointerEvents = "none";
+nameInput.style.position = "fixed";
 nameInput.style.top = "0";
 nameInput.style.left = "0";
 nameInput.style.width = "1px";
@@ -55,7 +55,6 @@ nameInput.style.height = "1px";
 nameInput.tabIndex = -1;
 document.body.appendChild(nameInput);
 
-// タイトル専用のキー入力ハンドラ
 async function handleTitleKeys(e) {
   if (!isNameInputActive) {
   if (e.key === 'ArrowUp') {
@@ -71,7 +70,6 @@ async function handleTitleKeys(e) {
       drawTitle();
     }
     else if (e.key === 'c') {
-      // クレジット画面へ遷移
       cleanupTitle();
       selectCreditsSE.currentTime = 0;
       selectCreditsSE.play();
@@ -82,7 +80,6 @@ async function handleTitleKeys(e) {
       startTitle();
     }
     else if (e.key === 'Enter') {
-      // メニューに応じて遷移
       cleanupTitle();
       if (selectedTitleMenuIndex === 0) {
         gameStartSE.currentTime = 0;
@@ -130,7 +127,6 @@ async function handleTitleKeys(e) {
   }
 }
 
-// タイトル画面を開始する関数
 export function startTitle() {
   selectedTitleMenuIndex = 0;
   drawTitle();
@@ -177,10 +173,10 @@ function handleCanvasClick(e) {
     selectCreditsSE.currentTime = 0;
     selectCreditsSE.play();
     isNameInputActive = true;
-    nameInput.focus(); // IME入力開始
+    nameInput.focus();
   } else {
     isNameInputActive = false;
-    nameInput.blur(); // 入力終了
+    nameInput.blur();
   }
 
   drawTitle();
@@ -191,7 +187,6 @@ function handleNameInput(e) {
   drawTitle();
 }
 
-// タイトル画面から離れるときにイベントを解除する
 function cleanupTitle() {
   document.removeEventListener('keydown', handleTitleKeys);
   canvas.removeEventListener("click", handleCanvasClick);
@@ -202,7 +197,6 @@ function drawTitle() {
   ctx.fillStyle = COLORS.background;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // 背景画像
   if (bgImage.complete && bgImage.naturalWidth !== 0) {
 
     ctx.drawImage(bgImage, 0, 0, SCREEN_BOUNDS.drawW, SCREEN_BOUNDS.drawH);
@@ -235,7 +229,6 @@ function drawTitle() {
   const menuY = SCREEN_BOUNDS.drawH * 0.75;
   const spacing = SPACE.menuSpacing;
 
-  // 「遊び方」を基準に上下に配置
   const howToPlayY = menuY;
   const gameStartY = howToPlayY - spacing;
   const recordsY = howToPlayY + spacing;
@@ -245,7 +238,6 @@ function drawTitle() {
   titleMenuItems.forEach((item, i) => {
     const y = menuPositions[i];
 
-    // メニュー文字描画
     ctx.strokeText(item.label, menuX, y);
     ctx.fillText(item.label, menuX, y);
 
@@ -255,11 +247,9 @@ function drawTitle() {
 
       // テキストサイズと余白を考慮して左に配置
       const pointerX = menuX - ctx.measureText(item.label).width / 2 - menuFontSize;
-      
-      // 縁取り
+
       ctx.strokeText(pointerText, pointerX, y);
 
-      // 塗り
       ctx.fillText(pointerText, pointerX, y);
     }
   });
@@ -277,16 +267,13 @@ function drawTitle() {
 }
 
 function drawNameBox() {
-  // 背景
   ctx.fillStyle = COLORS.nameBg;
   ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
 
-  // 枠
   ctx.strokeStyle = isNameInputActive ? "yellow" : COLORS.border;
   ctx.lineWidth = FONT_SIZES.lineWidth;
   ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
 
-  // テキスト
   ctx.font = `${FONT_SIZES.name}px ${FONT_STYLE.fontStyle}`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';

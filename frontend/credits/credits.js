@@ -43,9 +43,9 @@ export function showCredits(ctx, canvas) {
         selectCreditsSE.currentTime = 0;
         selectCreditsSE.play();
         fadeOut(ctxRef, canvasRef, 1000, 1000, () => {
-          renderCreditsFrame(); // フェード中に呼ばれる
+          renderCreditsFrame();
         }).then(() => {
-          resolve(); // クレジット画面終了 → 呼び出し元へ制御を返す
+          resolve();
         });
       } else if (e.key === "ArrowUp") {
         scrollY = Math.max(0, scrollY - keyScrollAmount);
@@ -68,7 +68,6 @@ export function showCredits(ctx, canvas) {
       }
     }
 
-    // イベント登録
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("wheel", handleWheel, { passive: true });
 

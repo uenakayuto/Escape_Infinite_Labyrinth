@@ -11,7 +11,6 @@ export function generateInitialBoard() {
 
   const occupied = new Set();
 
-  // 数量制限をカウントする辞書
   const countX = { block: {}, enemy: {} };
   const countY = { block: {}, enemy: {} };
 
@@ -34,7 +33,7 @@ export function generateInitialBoard() {
     // Y制限
     if ((countY.enemy[yi] || 0) >= QUANTITY_LIMIT.YENEMY) return false;
 
-    // 5: 垂直移動の敵がプレイヤ/鍵/ゴールとX座標一致しブロック遮蔽なし
+    // 垂直移動の敵がプレイヤ/鍵/ゴールとX座標一致しブロック遮蔽なし
     if (axis === 1) {
       for (const target of [player, key, goal]) {
         if (target && target.pos.x === x) {
@@ -43,7 +42,7 @@ export function generateInitialBoard() {
       }
     }
 
-    // 6: 水平移動の敵がプレイヤ/鍵/ゴールとY座標一致しブロック遮蔽なし
+    // 水平移動の敵がプレイヤ/鍵/ゴールとY座標一致しブロック遮蔽なし
     if (axis === 0) {
       for (const target of [player, key, goal]) {
         if (target && target.pos.y === y) {
@@ -86,7 +85,7 @@ export function generateInitialBoard() {
   }
 
   while (true) {
-    // --- 全配置を試す ---
+    // 初期化
     occupied.clear();
     Object.keys(countX.block).forEach(k => delete countX.block[k]);
     Object.keys(countY.block).forEach(k => delete countY.block[k]);
@@ -136,7 +135,7 @@ export function generateInitialBoard() {
       enemies,
     };
 
-    // --- 7. clearCheck ---
+    // クリアチェック
     if (clearCheck(board)) {
       board.player.pos.x += DIFF_OBJECT;
       board.player.pos.y += DIFF_OBJECT;

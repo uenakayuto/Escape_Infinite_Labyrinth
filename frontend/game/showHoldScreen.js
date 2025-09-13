@@ -4,22 +4,20 @@ import { COLORS } from "../util/color.js";
 
 const { drawW, drawH } = SCREEN_BOUNDS;
 
-export function showHoldScreen(ctx, canvas, boardData, hold, message) {
+export function showHoldScreen(ctx, boardData, hold, message) {
   return new Promise((resolve) => {
-    drawScreenToHold(ctx, canvas, boardData, message);
+    drawScreenToHold(ctx, boardData, message);
 
-    // 1.5秒後に終了
     setTimeout(() => {
       resolve();
     }, hold);
   });
 }
 
-export function drawScreenToHold(ctx, canvas, boardData, message) {
-  // 背景（盤面など）を描画
+export function drawScreenToHold(ctx, boardData, message) {
+
   drawGameBoard(ctx, boardData);
 
-  // テキスト描画
   const text = message;
   ctx.font = `bold ${FONT_SIZES.stageClear}px ${FONT_STYLE.fontStyle}`;
   ctx.textAlign = "center";

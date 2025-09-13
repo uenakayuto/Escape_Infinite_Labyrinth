@@ -16,7 +16,7 @@ let selectedPauseMenuIndex = 0;
 export function showPauseScreen(ctx, canvas, boardData) {
   return new Promise((resolve) => {
     selectedPauseMenuIndex = 0;
-    // 最初に描画
+
     drawPauseScreen(ctx, canvas, boardData);
 
     function onKeyDown(e) {
@@ -36,29 +36,24 @@ export function showPauseScreen(ctx, canvas, boardData) {
       } else if (e.key === "Enter") {
         const selectedAction = pauseMenuItems[selectedPauseMenuIndex].action;
 
-        // キーイベントを解除
         window.removeEventListener("keydown", onKeyDown);
 
-        // resolveで呼び出し元に返す
         resolve(selectedAction);
       }
     }
 
-    // イベントリスナー登録
     window.addEventListener("keydown", onKeyDown);
   });
 }
 
 export function drawPauseScreen(ctx, canvas, boardData) {
 
-  // 背景を描画
   drawGameBoard(ctx, boardData);
 
   // 画面全体を少し暗くする（透明な黒を重ねる）
-  ctx.fillStyle = "rgba(0, 0, 0, 0.5)"; // 50%透明の黒
+  ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // 中央の黒い矩形を描画
   const rectW = 3 * drawW / 4;
   const rectH = 3 * drawH / 4;
   const rectX = drawW / 8;
@@ -70,7 +65,6 @@ export function drawPauseScreen(ctx, canvas, boardData) {
   ctx.fillStyle = COLORS.fade;
   ctx.fillRect(rectX, rectY, rectW, rectH);
 
-  // 中央に「PAUSE」テキストを表示
   ctx.font = `bold ${FONT_SIZES.title}px ${FONT_STYLE.fontStyle}`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -80,7 +74,6 @@ export function drawPauseScreen(ctx, canvas, boardData) {
   ctx.fillStyle = COLORS.whiteText;
   ctx.fillText("Pause", drawW / 2, drawH / 4);
 
-  // メニュー項目を描画
   const menuYStart = drawH / 2 + SPACE.menuSpacing;
   ctx.font = `${FONT_SIZES.menu}px ${FONT_STYLE.fontStyle}`;
 

@@ -15,7 +15,7 @@ let selectedResultMenuIndex = 0;
 export function showResult(ctx, canvas, floor, time) {
     return new Promise((resolve) => {
         selectedResultMenuIndex = 0;
-        // 最初に描画
+
         drawResult(ctx, canvas, floor, time);
 
         function onKeyDown(e) {
@@ -35,15 +35,12 @@ export function showResult(ctx, canvas, floor, time) {
             } else if (e.key === "Enter") {
                 const selectedAction = resultMenuItems[selectedResultMenuIndex].action;
 
-                // キーイベントを解除
                 window.removeEventListener("keydown", onKeyDown);
 
-                // resolveで呼び出し元に返す
                 resolve(selectedAction);
             }
         }
 
-        // イベントリスナー登録
         window.addEventListener("keydown", onKeyDown);
     });
 }

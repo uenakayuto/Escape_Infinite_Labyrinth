@@ -11,17 +11,17 @@ export function fadeOut(ctx, canvas, duration = 1000, hold = 1000, drawScene = (
       // フェード比率 0～1
       const alpha = Math.min(elapsed / duration, 1);
 
-      // 1) シーンを毎フレーム描画
+      // シーンを毎フレーム描画
       drawScene();
 
-      // 2) 黒い四角を透過度alphaで描画
+      // 黒い四角を透過度alphaで描画
       ctx.save();
       ctx.globalAlpha = alpha;
       ctx.fillStyle = COLORS.fade;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.restore();
 
-      // === BGMフェードアウト ===
+      // BGMフェードアウト
       if (isBgm && bgm) {
         const totalTime = duration;
         const bgmProgress = Math.min(elapsed / totalTime, 1);
@@ -61,10 +61,10 @@ export function fadeIn(ctx, canvas, duration = 2500, drawScene = () => {}) {
             // フェード比率 0～1
             const alpha = Math.max(0, 1 - elapsed / duration);
 
-            // 1) シーンを毎フレーム描画
+            // シーンを毎フレーム描画
             drawScene();
 
-            // 2) 黒い四角を透過度alphaで描画
+            // 黒い四角を透過度alphaで描画
             ctx.save();
             ctx.globalAlpha = alpha;
             ctx.fillStyle = COLORS.fade;

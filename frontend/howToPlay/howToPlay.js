@@ -63,9 +63,9 @@ export async function showHowToPlay(ctx, canvas) {
         menuSelectSE.currentTime = 0;
         menuSelectSE.play();
         fadeOut(ctxRef, canvasRef, 1000, 1000, () => {
-          renderHowToPlayFrame(); // フェード中に呼ばれる
+          renderHowToPlayFrame();
         }).then(() => {
-          resolve(); // クレジット画面終了 → 呼び出し元へ制御を返す
+          resolve();
         });
       } else if (e.key === "ArrowUp") {
         scrollY = Math.max(0, scrollY - keyScrollAmount);
@@ -88,7 +88,6 @@ export async function showHowToPlay(ctx, canvas) {
       }
     }
 
-    // イベント登録
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("wheel", handleWheel, { passive: true });
 
@@ -105,7 +104,6 @@ function renderHowToPlayFrame() {
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
 
-  // タイトル
   ctx.font = `bold ${FONT_SIZES.title}px ${FONT_STYLE.fontStyle}`;
   ctx.strokeStyle = COLORS.border;
   ctx.lineWidth = FONT_SIZES.lineWidth;
@@ -114,7 +112,6 @@ function renderHowToPlayFrame() {
   ctx.fillStyle = COLORS.whiteText;
   ctx.fillText("遊び方", canvas.width / 2, titleY);
 
-  // コンテンツ描画
   const x = FONT_SIZES.creditSubtitle;
   let y = titleY + FONT_SIZES.title * 2;
   const buttonSize = FONT_SIZES.menu;
@@ -122,7 +119,6 @@ function renderHowToPlayFrame() {
   ctx.textAlign = "left";
   ctx.font = `${FONT_SIZES.creditSubtitle}px ${FONT_STYLE.fontStyle}`;
 
-  // 操作方法
   ctx.strokeText("操作方法", x, y);
   ctx.fillText("操作方法", x, y);
   y += FONT_SIZES.creditSubtitle * 1.25;
@@ -142,7 +138,6 @@ function renderHowToPlayFrame() {
   ctx.fillText(": Pause", x + 3 * buttonSize + buttonSpace, y);
   y += FONT_SIZES.creditSubtitle * 2;
 
-  // ルール説明
   ctx.font = `${FONT_SIZES.creditSubtitle}px ${FONT_STYLE.fontStyle}`;
   ctx.strokeText("ルール", x, y);
   ctx.fillText("ルール", x, y);
@@ -219,7 +214,6 @@ function renderHowToPlayFrame() {
   ctx.fillStyle = COLORS.whiteText;
   ctx.fillText("短い時間で多くのフロアをクリアしよう！", drawW / 2, y);
 
-  // 戻るメッセージ
   y += FONT_SIZES.title * 3;
   ctx.textAlign = "center";
   ctx.font = `${FONT_SIZES.creditSubtitle}px ${FONT_STYLE.fontStyle}`;
@@ -227,7 +221,6 @@ function renderHowToPlayFrame() {
   ctx.fillText("タイトルに戻る [Enter]", canvas.width / 2, y);
   y += FONT_SIZES.creditSubtitle + drawH * 0.1 + scrollY;
 
-  // 最大スクロール量を計算
   maxScrollY = Math.max(0, y - (drawH));
 }
 
@@ -238,14 +231,13 @@ function renderHowToPlay() {
 
 function drawButton(ctx, x, y, width, height, label) {
   // 背景の矩形（丸みあり）
-  ctx.fillStyle = COLORS.foreground;       // 背景色
-  ctx.strokeStyle = COLORS.whiteBorder;     // 枠線色
+  ctx.fillStyle = COLORS.foreground;
+  ctx.strokeStyle = COLORS.whiteBorder;
   roundRect(ctx, x, y, width, height, 10);
   ctx.fill();
   ctx.stroke();
 
-  // テキスト
-  ctx.fillStyle = COLORS.whiteText;       // 文字色
+  ctx.fillStyle = COLORS.whiteText;
   ctx.font = `${3 * FONT_SIZES.menu / 4}px ${FONT_STYLE.fontStyle}`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -256,7 +248,7 @@ function drawButton(ctx, x, y, width, height, label) {
   ctx.textBaseline = "top";
 }
 
-// 丸角矩形を描くユーティリティ
+// 丸角矩形を描く関数
 function roundRect(ctx, x, y, width, height, radius) {
   ctx.beginPath();
   ctx.moveTo(x + radius, y);
