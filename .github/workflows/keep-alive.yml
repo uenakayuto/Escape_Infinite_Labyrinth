@@ -2,16 +2,18 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    - cron: "0 0 */6 * *" # 6日に1回実行
+    - cron: "0 0 * * *" # 毎日 0:00 UTC に実行（日本時間 9:00）
   workflow_dispatch: # 手動実行も可能
 
 jobs:
-  ping:
+  keepalive:
     runs-on: ubuntu-latest
     steps:
-      - name: Query Supabase
+      - name: Insert keepalive record
         run: |
-          curl -s -X GET \
+          curl -s -X POST \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/scores?select=id&limit=1"
+            -H "Content-Type: application/json" \
+            -d "{\"note\": \"keepalive from GitHub Actions\"}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/keepalive_log"
