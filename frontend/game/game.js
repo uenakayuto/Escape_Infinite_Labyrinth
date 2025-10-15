@@ -134,7 +134,7 @@ export async function startGame(ctx, canvas, playerName, boardData) {
   gameBgm.currentTime = 0;
   gameBgm.play();
 
-  requestAnimationFrame(() => gameLoop(ctx, canvas, boardData, playerName));
+  requestAnimationFrame(() => gameLoop(ctx, canvas, boardData, playerName, startTime));
 }
 
 export function drawGameBoard(ctx, boardData) {
@@ -213,7 +213,7 @@ export function drawGameBoard(ctx, boardData) {
   drawElapsedTimeAndFloor(ctx, elapsedTime, currentFloor);
 }
 
-async function gameLoop(ctx, canvas, boardData, playerName) {
+async function gameLoop(ctx, canvas, boardData, playerName, previousGameTime) {
 
   if (isPaused) {
     // 一時停止中の処理
@@ -231,8 +231,9 @@ async function gameLoop(ctx, canvas, boardData, playerName) {
       gameBgm.play();
       document.addEventListener('keydown', handleGameKeyDown);
       document.addEventListener('keyup', handleGameKeyUp);
-      pauseElapsedTime += performance.now() - pauseStartTime;
-      requestAnimationFrame(() => gameLoop(ctx, canvas, boardData, playerName));
+      previousGameTime = performance.now();
+      pauseElapsedTime += previousGameTime - pauseStartTime;
+      requestAnimationFrame(() => gameLoop(ctx, canvas, boardData, playerName, previousGameTime));
     }
     else if (responseFromPause === 'restart') {
       // リスタート
@@ -259,14 +260,18 @@ async function gameLoop(ctx, canvas, boardData, playerName) {
   }
 
   else {
+    const currentGameTime = performance.now();
+    const deltaTime = currentGameTime - previousGameTime;
+    previousGameTime = currentGameTime;
+
     // 盤面更新（敵の移動など）
-    boardData = gameLogic(boardData, pressedKeys);
+    boardData = gameLogic(boardData, pressedKeys, deltaTime);
 
     // 描画
     if (!gameState.isGameOver && !gameState.isGoal) {
-      elapsedTime = performance.now() - startTime - pauseElapsedTime;
+      elapsedTime = previousGameTime - startTime - pauseElapsedTime;
       drawGameBoard(ctx, boardData);
-      requestAnimationFrame(() => gameLoop(ctx, canvas, boardData, playerName));
+      requestAnimationFrame(() => gameLoop(ctx, canvas, boardData, playerName, previousGameTime));
     } else if (gameState.isGoal) {
       // ゴールした場合の処理
       document.removeEventListener('keydown', handleGameKeyDown);
@@ -282,14 +287,15 @@ async function gameLoop(ctx, canvas, boardData, playerName) {
 
       initGameVariables();
 
-      pauseElapsedTime += performance.now() - pauseStartTime;
-      elapsedTime = performance.now() - startTime - pauseElapsedTime;
+      previousGameTime = performance.now();
+      pauseElapsedTime += previousGameTime - pauseStartTime;
+      elapsedTime = previousGameTime - startTime - pauseElapsedTime;
       currentFloor += 1;
       drawGameBoard(ctx, boardData);
 
       document.addEventListener('keydown', handleGameKeyDown);
       document.addEventListener('keyup', handleGameKeyUp);
-      requestAnimationFrame(() => gameLoop(ctx, canvas, boardData, playerName));
+      requestAnimationFrame(() => gameLoop(ctx, canvas, boardData, playerName, previousGameTime));
     } else if (gameState.isGameOver) {
       // ゲームオーバーの場合の処理
       gameBgm.pause();
