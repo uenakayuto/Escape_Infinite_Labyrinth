@@ -10,7 +10,7 @@ const gameOverSE = new Audio('./resource/se/game_over.ogg');
 
 const { drawW, drawH } = SCREEN_BOUNDS;
 
-export function gameLogic(board, pressedKeys) {
+export function gameLogic(board, pressedKeys, deltaTime) {
   const { player, key: keyItem, goal, blocks, enemies } = board;
 
   let newX = player.pos.x;
@@ -19,11 +19,13 @@ export function gameLogic(board, pressedKeys) {
   let axis = null;
   let dir = null;
 
+  const playerMoveDistance = player.speed * deltaTime / 16.67;
+
   // プレイヤーの移動処理
-  if (pressedKeys.up) {newY -= player.speed; axis = 1; dir = 1;}
-  if (pressedKeys.down) {newY += player.speed; axis = 1; dir = 0;}
-  if (pressedKeys.left) {newX -= player.speed; axis = 0; dir = 1;}
-  if (pressedKeys.right) {newX += player.speed; axis = 0; dir = 0;}
+  if (pressedKeys.up) {newY -= playerMoveDistance; axis = 1; dir = 1;}
+  if (pressedKeys.down) {newY += playerMoveDistance; axis = 1; dir = 0;}
+  if (pressedKeys.left) {newX -= playerMoveDistance; axis = 0; dir = 1;}
+  if (pressedKeys.right) {newX += playerMoveDistance; axis = 0; dir = 0;}
 
   if (axis !== null && dir !== null) {
     const resolvedPos = resolveCollision(newX, newY, axis, dir, blocks);
@@ -37,9 +39,11 @@ export function gameLogic(board, pressedKeys) {
     let newX = pos.x;
     let newY = pos.y;
 
+    const enemyMoveDistance = speed * deltaTime / 16.67;
+
     // 移動量計算
-    if (axis === 0) newX += (dir === 0 ? speed : -speed);
-    else newY += (dir === 0 ? speed : -speed);
+    if (axis === 0) newX += (dir === 0 ? enemyMoveDistance : -enemyMoveDistance);
+    else newY += (dir === 0 ? enemyMoveDistance : -enemyMoveDistance);
 
     const resolvedPos = resolveCollision(newX, newY, axis, dir, blocks);
     newX = resolvedPos.x;
