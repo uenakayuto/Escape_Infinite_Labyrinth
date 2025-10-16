@@ -11,6 +11,7 @@ import { COLORS } from "../util/color.js";
 import { showPauseScreen, drawPauseScreen } from "./showPauseScreen.js";
 import { startTitle, API_BASE_URL, menuSelectSE } from "../main.js";
 import { drawResult } from "../result/result.js";
+import { state } from "../util/name.js";
 
 const { drawW, drawH } = SCREEN_BOUNDS;
 
@@ -101,9 +102,10 @@ let clearFloor = 0;
 let clearTime = 0;
 
 let isPaused = false;
+let isAddEventListeners = false;
 
 // ゲーム開始関数
-export async function startGame(ctx, canvas, playerName, boardData) {
+export async function startGame(ctx, canvas, boardData) {
   // 状態保持変数を初期化
   initGameVariables();
   startTime = null;
@@ -134,7 +136,7 @@ export async function startGame(ctx, canvas, playerName, boardData) {
   gameBgm.currentTime = 0;
   gameBgm.play();
 
-  requestAnimationFrame(() => gameLoop(ctx, canvas, boardData, playerName, startTime));
+  requestAnimationFrame(() => gameLoop(ctx, canvas, boardData, startTime));
 }
 
 export function drawGameBoard(ctx, boardData) {
@@ -213,7 +215,7 @@ export function drawGameBoard(ctx, boardData) {
   drawElapsedTimeAndFloor(ctx, elapsedTime, currentFloor);
 }
 
-async function gameLoop(ctx, canvas, boardData, playerName, previousGameTime) {
+async function gameLoop(ctx, canvas, boardData, previousGameTime) {
 
   if (isPaused) {
     // 一時停止中の処理
@@ -233,7 +235,7 @@ async function gameLoop(ctx, canvas, boardData, playerName, previousGameTime) {
       document.addEventListener('keyup', handleGameKeyUp);
       previousGameTime = performance.now();
       pauseElapsedTime += previousGameTime - pauseStartTime;
-      requestAnimationFrame(() => gameLoop(ctx, canvas, boardData, playerName, previousGameTime));
+      requestAnimationFrame(() => gameLoop(ctx, canvas, boardData, previousGameTime));
     }
     else if (responseFromPause === 'restart') {
       // リスタート
@@ -246,7 +248,7 @@ async function gameLoop(ctx, canvas, boardData, playerName, previousGameTime) {
 
       await fadeOutPromise;
       boardData = await initialBoardPromise;
-      startGame(ctx, canvas, playerName, boardData);
+      startGame(ctx, canvas, boardData);
     }
     else if (responseFromPause === 'quit') {
       // タイトルへ戻る
@@ -271,7 +273,7 @@ async function gameLoop(ctx, canvas, boardData, playerName, previousGameTime) {
     if (!gameState.isGameOver && !gameState.isGoal) {
       elapsedTime = previousGameTime - startTime - pauseElapsedTime;
       drawGameBoard(ctx, boardData);
-      requestAnimationFrame(() => gameLoop(ctx, canvas, boardData, playerName, previousGameTime));
+      requestAnimationFrame(() => gameLoop(ctx, canvas, boardData, previousGameTime));
     } else if (gameState.isGoal) {
       // ゴールした場合の処理
       document.removeEventListener('keydown', handleGameKeyDown);
@@ -295,7 +297,7 @@ async function gameLoop(ctx, canvas, boardData, playerName, previousGameTime) {
 
       document.addEventListener('keydown', handleGameKeyDown);
       document.addEventListener('keyup', handleGameKeyUp);
-      requestAnimationFrame(() => gameLoop(ctx, canvas, boardData, playerName, previousGameTime));
+      requestAnimationFrame(() => gameLoop(ctx, canvas, boardData, previousGameTime));
     } else if (gameState.isGameOver) {
       // ゲームオーバーの場合の処理
       gameBgm.pause();
@@ -307,14 +309,20 @@ async function gameLoop(ctx, canvas, boardData, playerName, previousGameTime) {
       const clearTimeAfterParse = parseTime(clearTime);
       const date = new Date().toISOString();
 
-      if (playerName !== "") {
+      if (state.playerName === "") {
+        isAddEventListeners = true;
+      } else {
+        isAddEventListeners = false;
+      }
+
+      if (isAddEventListeners === false) {
         fetch(`${API_BASE_URL}/api/register`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            playerName,
+            playerName: state.playerName,
             clearFloor,
             clearTime,
             clearTimeAfterParse,
@@ -332,23 +340,24 @@ async function gameLoop(ctx, canvas, boardData, playerName, previousGameTime) {
       getKeyItemSE.currentTime = 0;
       getKeyItemSE.play();
       // リザルト画面へ
-      const resultAction = await showResult(ctx, canvas, clearFloor, clearTimeAfterParse);
+
+      const resultAction = await showResult(ctx, canvas, clearFloor, clearTime, clearTimeAfterParse, date, isAddEventListeners);
       if (resultAction === 'restart') {
         menuSelectSE.currentTime = 0;
         menuSelectSE.play();
         const fadeOutPromise = fadeOut(ctx, canvas, 1000, 1000, () => {
-          drawResult(ctx, canvas, clearFloor, clearTimeAfterParse);
+          drawResult(ctx, canvas, clearFloor, clearTimeAfterParse, isAddEventListeners);
         });
         const initialBoardPromise = generateInitialBoard();
 
         await fadeOutPromise;
         boardData = await initialBoardPromise;
-        startGame(ctx, canvas, playerName, boardData);
+        startGame(ctx, canvas, boardData);
       } else if (resultAction === 'title') {
         menuSelectSE.currentTime = 0;
         menuSelectSE.play();
         await fadeOut(ctx, canvas, 1000, 1000, () => {
-          drawResult(ctx, canvas, clearFloor, clearTimeAfterParse);
+          drawResult(ctx, canvas, clearFloor, clearTimeAfterParse, isAddEventListeners);
         });
         startTitle();
       }
