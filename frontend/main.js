@@ -190,7 +190,7 @@ export function startTitle() {
   bgmManager();
 
   if (titleBgm.paused) {
-    titleBgm.volume = 1.0;
+    titleBgm.volume = volumes.bgmVolume;
     titleBgm.currentTime = 0;
     titleBgm.play();
   }
@@ -245,7 +245,6 @@ function handleVolumeChange(e) {
   // BGMスライダー操作
   if (mouseY >= sliders.bgm.y && mouseY <= sliders.bgm.y + 20) {
     volumes.bgmVolume = Math.min(Math.max((mouseX - sliders.bgm.x) / sliders.bgm.width, 0), 1);
-    titleBgm.volume = volumes.bgmVolume;
   }
 
   // SEスライダー操作
