@@ -1,7 +1,7 @@
 import { showBaseScreen } from "../util/baseScreen.js";
 import { SCREEN_BOUNDS, FONT_SIZES, FONT_STYLE, SPACE } from "../util/fontsize.js";
 import { COLORS } from "../util/color.js";
-import { cousorSE, selectCreditsSE, boxX, boxY, boxWidth, boxHeight, nameInput, API_BASE_URL } from "../main.js";
+import { cousorSE, selectCreditsSE, boxX, boxY, boxWidth, boxHeight, nameInput } from "../main.js";
 import { state } from "../util/name.js";
 
 const { drawW, drawH } = SCREEN_BOUNDS;
