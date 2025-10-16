@@ -3,6 +3,10 @@ import { COLORS } from "./color.js";
 export function fadeOut(ctx, canvas, duration = 1000, hold = 1000, drawScene = () => {}, isBgm = false, bgm = null) {
   return new Promise((resolve) => {
     let startTime = null;
+    let baseBgmVolume = 0.1;
+    if (isBgm && bgm) {
+      baseBgmVolume = bgm.volume;
+    }
 
     function animate(now) {
       if (!startTime) startTime = now;
@@ -25,7 +29,7 @@ export function fadeOut(ctx, canvas, duration = 1000, hold = 1000, drawScene = (
       if (isBgm && bgm) {
         const totalTime = duration;
         const bgmProgress = Math.min(elapsed / totalTime, 1);
-        bgm.volume = Math.max(1 - bgmProgress, 0);
+        bgm.volume = Math.max((1 - bgmProgress) * baseBgmVolume, 0);
         if (bgm.volume <= 0.001) {
           bgm.pause();
           bgm.currentTime = 0;

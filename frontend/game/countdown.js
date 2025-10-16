@@ -4,7 +4,7 @@ import { COLORS } from "../util/color.js";
 
 const { drawW, drawH } = SCREEN_BOUNDS;
 
-const countdownSE = new Audio('./resource/se/countdown.ogg');
+export const countdownSE = new Audio('./resource/se/countdown.ogg');
 
 export function countdown(ctx, canvas, boardData) {
   return new Promise((resolve) => {
