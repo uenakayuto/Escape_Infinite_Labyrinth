@@ -12,7 +12,6 @@ import { showPauseScreen, drawPauseScreen } from "./showPauseScreen.js";
 import { startTitle, menuSelectSE } from "../main.js";
 import { drawResult } from "../result/result.js";
 import { state } from "../util/name.js";
-import { volumes } from "../util/bgmSettings.js";
 
 const { drawW, drawH } = SCREEN_BOUNDS;
 
