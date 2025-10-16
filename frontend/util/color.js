@@ -9,5 +9,8 @@ export const COLORS = {
   fade: '#000000',
   gold: '#ffd700',
   silver: '#c0c0c0',
-  bronze: '#cd7f32'
+  bronze: '#cd7f32',
+  barBackground: '#555555',
+  barFill: '#00ff00',
+  knob: '#dddddd'
 };

@@ -12,6 +12,7 @@ import { showPauseScreen, drawPauseScreen } from "./showPauseScreen.js";
 import { startTitle, menuSelectSE } from "../main.js";
 import { drawResult } from "../result/result.js";
 import { state } from "../util/name.js";
+import { volumes } from "../util/bgmSettings.js";
 
 const { drawW, drawH } = SCREEN_BOUNDS;
 
@@ -51,13 +52,13 @@ enemyLookUpImg.src = './resource/img/object/enemy_look_up.png';
 const enemyLookDownImg = new Image();
 enemyLookDownImg.src = './resource/img/object/enemy_look_down.png';
 
-const fadeInGameSE = new Audio('./resource/se/fade_in_game.ogg');
+export const fadeInGameSE = new Audio('./resource/se/fade_in_game.ogg');
 
-const gameStartGameSE = new Audio('./resource/se/game_start_game.ogg');
+export const gameStartGameSE = new Audio('./resource/se/game_start_game.ogg');
 
-const getKeyItemSE = new Audio('./resource/se/get_key.ogg');
+export const getKeyItemSE = new Audio('./resource/se/get_key.ogg');
 
-const gameBgm = new Audio('./resource/bgm/game.ogg');
+export const gameBgm = new Audio('./resource/bgm/game.ogg');
 gameBgm.loop = true;
 
 // 全画像を配列にまとめる

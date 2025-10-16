@@ -1,13 +1,16 @@
 import { COLORS } from "./util/color.js"; 
-import { FONT_SIZES, FONT_STYLE, SPACE, SCREEN_BOUNDS } from "./util/fontsize.js";
+import { FONT_SIZES, FONT_STYLE, SPACE, SCREEN_BOUNDS, sliderSize } from "./util/fontsize.js";
 import { fadeOut } from "./util/fade.js";
-import { startGame } from "./game/game.js";
+import { startGame, fadeInGameSE, gameStartGameSE, getKeyItemSE, gameBgm } from "./game/game.js";
+import { goalSE, gameOverSE } from "./game/logic.js";
+import { countdownSE } from "./game/countdown.js";
 import { generateInitialBoard } from "./game/randomGenerator.js";
 import { showHowToPlay } from "./howToPlay/howToPlay.js";
 import { showRecords, drawRecords } from "./record/record.js";
 import { showCredits } from "./credits/credits.js";
 import { showBaseScreen } from "./util/baseScreen.js";
 import { state } from "./util/name.js";
+import { volumes } from "./util/bgmSettings.js";
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -21,7 +24,6 @@ bgImage.src = './resource/img/title_screen.png';
 export const cousorSE = new Audio('./resource/se/cursor.ogg');
 
 export const selectCreditsSE = new Audio('./resource/se/select_credits.ogg');
-selectCreditsSE.volume = 0.8;
 
 const gameStartSE = new Audio('./resource/se/game_start.ogg');
 
@@ -29,6 +31,50 @@ export const menuSelectSE = new Audio('./resource/se/menu_select.ogg');
 
 export const titleBgm = new Audio('./resource/bgm/title.ogg');
 titleBgm.loop = true;
+
+const sliders = {
+  bgm: { x: SCREEN_BOUNDS.drawW - sliderSize.width - sliderSize.height, y: SCREEN_BOUNDS.drawH - 4 * sliderSize.height, width: sliderSize.width, height: sliderSize.height },
+  se:  { x: SCREEN_BOUNDS.drawW - sliderSize.width - sliderSize.height, y: SCREEN_BOUNDS.drawH - 2 * sliderSize.height, width: sliderSize.width, height: sliderSize.height }
+};
+
+function drawSlider(ctx, label, slider, value) {
+  // ラベル
+  ctx.font = `${sliderSize.height}px ${FONT_STYLE.fontStyle}`;
+  ctx.fillStyle = COLORS.whiteText;
+
+  ctx.textAlign = "right";
+  ctx.fillText(label, slider.x - sliderSize.height, slider.y);
+
+  // バー（背景）
+  ctx.fillStyle = COLORS.barBackground;
+  ctx.fillRect(slider.x, slider.y, slider.width, slider.height);
+
+  // バー（値）
+  ctx.fillStyle = COLORS.barFill;
+  ctx.fillRect(slider.x, slider.y, slider.width * value, slider.height);
+
+  // ノブ
+  ctx.beginPath();
+  ctx.arc(slider.x + slider.width * value, slider.y + slider.height / 2, slider.height / 2, 0, Math.PI * 2);
+  ctx.fillStyle = COLORS.knob;
+  ctx.fill();
+}
+
+function bgmManager() {
+  cousorSE.volume = volumes.seVolume;
+  selectCreditsSE.volume = 0.8 * volumes.seVolume;
+  gameStartSE.volume = volumes.seVolume;
+  menuSelectSE.volume = volumes.seVolume;
+  countdownSE.volume = volumes.seVolume;
+  fadeInGameSE.volume = volumes.seVolume;
+  gameStartGameSE.volume = volumes.seVolume;
+  getKeyItemSE.volume = volumes.seVolume;
+  goalSE.volume = volumes.seVolume;
+  gameOverSE.volume = volumes.seVolume;
+
+  titleBgm.volume = volumes.bgmVolume;
+  gameBgm.volume = volumes.bgmVolume;
+}
 
 // ▼ 選択中メニューを保持（0=ゲームスタート, 1=遊び方, 2=ランキング）
 let selectedTitleMenuIndex = 0;
@@ -137,7 +183,11 @@ export function startTitle() {
 
   nameInput.addEventListener("input", handleNameInput);
 
+  canvas.addEventListener("mousedown", handleVolumeChange);
+
   bgImage.onload = () => drawTitle();
+
+  bgmManager();
 
   if (titleBgm.paused) {
     titleBgm.volume = 1.0;
@@ -187,10 +237,32 @@ function handleNameInput(e) {
   drawTitle();
 }
 
+function handleVolumeChange(e) {
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+  const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+  // BGMスライダー操作
+  if (mouseY >= sliders.bgm.y && mouseY <= sliders.bgm.y + 20) {
+    volumes.bgmVolume = Math.min(Math.max((mouseX - sliders.bgm.x) / sliders.bgm.width, 0), 1);
+    titleBgm.volume = volumes.bgmVolume;
+  }
+
+  // SEスライダー操作
+  if (mouseY >= sliders.se.y && mouseY <= sliders.se.y + 20) {
+    volumes.seVolume = Math.min(Math.max((mouseX - sliders.se.x) / sliders.se.width, 0), 1);
+  }
+
+  bgmManager();
+
+  drawTitle();
+}
+
 function cleanupTitle() {
   document.removeEventListener('keydown', handleTitleKeys);
   canvas.removeEventListener("click", handleCanvasClick);
   nameInput.removeEventListener("input", handleNameInput);
+  canvas.removeEventListener("mousedown", handleVolumeChange);
 }
 
 function drawTitle() {
@@ -264,6 +336,14 @@ function drawTitle() {
   const creditY = SCREEN_BOUNDS.drawH - SPACE.paddingCreditsBottomOnTitle;
 
   ctx.fillText(creditText, creditX, creditY);
+
+  ctx.font = `${sliderSize.height}px ${FONT_STYLE.fontStyle}`;
+
+  ctx.textBaseline = "top";
+  ctx.fillText("クリックで調整", sliders.bgm.x + sliders.bgm.width / 2, sliders.bgm.y - 1.5 * sliderSize.height);
+
+  drawSlider(ctx, "BGM", sliders.bgm, volumes.bgmVolume);
+  drawSlider(ctx, "SE", sliders.se, volumes.seVolume);
 }
 
 function drawNameBox() {

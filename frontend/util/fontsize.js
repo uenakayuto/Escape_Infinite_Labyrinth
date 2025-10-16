@@ -29,3 +29,8 @@ export const SCREEN_BOUNDS = {
     drawW: 1500,
     drawH: 780
 };
+
+export const sliderSize = {
+  width: 200,
+  height: 20
+};
