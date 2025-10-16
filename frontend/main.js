@@ -7,6 +7,7 @@ import { showHowToPlay } from "./howToPlay/howToPlay.js";
 import { showRecords, drawRecords } from "./record/record.js";
 import { showCredits } from "./credits/credits.js";
 import { showBaseScreen } from "./util/baseScreen.js";
+import { state } from "./util/name.js";
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -39,10 +40,9 @@ const titleMenuItems = [
   { label: "ランキングを見る" }
 ];
 
-let playerName = "";
 let isNameInputActive = false;
 
-const nameInput = document.createElement("input");
+export const nameInput = document.createElement("input");
 nameInput.type = "text";
 nameInput.maxLength = 12;
 nameInput.style.opacity = 0;
@@ -91,7 +91,7 @@ async function handleTitleKeys(e) {
 
         await fadeOutPromise;
         const boardData = await initialBoardPromise;
-        startGame(ctx, canvas, playerName, boardData);
+        startGame(ctx, canvas, boardData);
       } else if (selectedTitleMenuIndex === 1) {
         menuSelectSE.currentTime = 0;
         menuSelectSE.play();
@@ -147,11 +147,11 @@ export function startTitle() {
 }
 
 const boxPadding = SPACE.paddingNameBox;
-const boxHeight = FONT_SIZES.name + boxPadding * 2;
-const boxWidth = FONT_SIZES.name * 16 + boxPadding * 2;
+export const boxHeight = FONT_SIZES.name + boxPadding * 2;
+export const boxWidth = FONT_SIZES.name * 16 + boxPadding * 2;
 
-const boxX = SCREEN_BOUNDS.drawW - boxWidth - FONT_SIZES.lineWidth;
-const boxY = FONT_SIZES.lineWidth;
+export const boxX = SCREEN_BOUNDS.drawW - boxWidth - FONT_SIZES.lineWidth;
+export const boxY = FONT_SIZES.lineWidth;
 
 function handleCanvasClick(e) {
   const rect = canvas.getBoundingClientRect();
@@ -183,7 +183,7 @@ function handleCanvasClick(e) {
 }
 
 function handleNameInput(e) {
-  playerName = e.target.value;
+  state.playerName = e.target.value;
   drawTitle();
 }
 
@@ -277,7 +277,7 @@ function drawNameBox() {
   ctx.font = `${FONT_SIZES.name}px ${FONT_STYLE.fontStyle}`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  const text = playerName || "ニックネームを入力(12文字以内)";
+  const text = state.playerName || "ニックネームを入力(12文字以内)";
   ctx.fillStyle = COLORS.whiteText;
   ctx.fillText(text, boxX + boxWidth / 2, boxY + boxHeight / 2);
 }

@@ -9,6 +9,6 @@ export const QUANTITY_LIMIT = {
   YENEMIES: 3
 };
 
-export const PLAYER_SPEED = 5;
+export const PLAYER_SPEED = 8;
 
 export const DIFF_OBJECT = 5;
