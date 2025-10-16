@@ -4,10 +4,8 @@ import { gameState, getKeyItemSE } from "./game.js";
 import { volumes } from "../util/bgmSettings.js";
 
 export const goalSE = new Audio('./resource/se/goal.ogg');
-goalSE.volume = 1.0 * volumes.seVolume;
 
 export const gameOverSE = new Audio('./resource/se/game_over.ogg');
-gameOverSE.volume = 1.0 * volumes.seVolume;
 
 const { drawW, drawH } = SCREEN_BOUNDS;
 
