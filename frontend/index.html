@@ -2,7 +2,21 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <title>Escape Infinite Labyrinth</title>
+  <title>Escape Infinite Labyrinth - マップクリア型ブラウザゲーム</title>
+  <meta name="description" content="フロアの脱出を目指すアクションゲーム『Escape Infinite Labyrinth』．ブラウザで無料プレイ可能．自作ゲームとして細部まで作り込まれたステージと軽快な操作感を体験しよう．">
+  <meta name="keywords" content="Escape Infinite Labyrinth, ブラウザゲーム, マップクリア, アクション, 無料ゲーム, JavaScript, Vercel">
+  <meta name="robots" content="index, follow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SNS共有用 -->
+  <meta property="og:title" content="Escape Infinite Labyrinth - マップクリア型ブラウザゲーム">
+  <meta property="og:description" content="フロアから脱出せよ！ブラウザで無料プレイ可能な自作アクションゲーム．">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://escape-infinite-labyrinth.vercel.app/">
+  <meta property="og:image" content="https://escape-infinite-labyrinth.vercel.app/resource/img/titlescreen.png">
+
+  <meta name="google-site-verification" content="w89uiVN76sVeYN2kYgguOtQ9Hmq7mive0x337lrbMCI" />
+
   <link rel="stylesheet" href="index.css">
   <link rel="icon" href="resource/img/favicon.ico" type="image/x-icon">
 </head>
@@ -10,10 +24,7 @@
   <canvas id="canvas"></canvas>
   <script type="module">
     import { showFirstScreen } from "./main.js";
-
-    window.addEventListener("load", () => {
-      showFirstScreen();
-    });
+    window.addEventListener("load", () => showFirstScreen());
   </script>
 </body>
 </html>

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://escape-infinite-labyrinth.vercel.app/sitemap.xml
