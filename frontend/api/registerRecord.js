@@ -30,7 +30,7 @@ export default async function handler(req, res) {
   // 2. ランキングを取得
   const { data: rows, error: selectError } = await supabase
     .from("scores")
-    .select("*")
+    .select("id, clearfloor, cleartime, date")
     .order("clearfloor", { ascending: false })
     .order("cleartime", { ascending: true })
     .order("date", { ascending: true });
@@ -46,5 +46,5 @@ export default async function handler(req, res) {
   }
 
   // 4. 上位5件を返す
-  return res.status(200).json(rows.slice(0, 5));
+  return res.status(200).json({ message: "Score inserted and old scores cleaned up." });
 }
