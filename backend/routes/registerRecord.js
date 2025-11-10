@@ -27,7 +27,7 @@ router.post("/", (req, res) => {
 
         // ランキング取得
         db.all(
-          `SELECT * FROM scores
+          `SELECT id, clearFloor, clearTime, date FROM scores
            ORDER BY clearFloor DESC, clearTime ASC, date ASC`,
           [],
           (err, rows) => {
