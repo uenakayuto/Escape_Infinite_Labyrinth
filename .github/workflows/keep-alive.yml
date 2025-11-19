@@ -1,44 +1,61 @@
-name: Keep Supabase Alive
+- name: Insert keepalive record (debug)
+  id: insert
+  run: |
+    set -euo pipefail
 
-on:
-  schedule:
-    - cron: "0 * * * *" # 毎時実行
-  workflow_dispatch:
+    # POSTして、body と HTTP ステータスを取得
+    RESPONSE=$(curl -sS -w "\n%{http_code}" -X POST \
+      -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+      -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+      -H "Content-Type: application/json" \
+      -H "Prefer: return=representation" \
+      -d "{\"note\": \"keepalive from GitHub Actions\"}" \
+      "${{ secrets.SUPABASE_URL }}/rest/v1/keepalive_log" ) || true
 
-jobs:
-  keepalive:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install jq
-        run: sudo apt-get install -y jq
+    # body と status を分離
+    HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+    BODY=$(echo "$RESPONSE" | sed '$d')
 
-      - name: Insert keepalive record
-        id: insert
-        run: |
-          RESPONSE=$(curl -s -X POST \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Content-Type: application/json" \
-            -H "Prefer: return=representation" \
-            -d "{\"note\": \"keepalive from GitHub Actions\"}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/keepalive_log")
+    echo "===== RESPONSE BODY ====="
+    echo "$BODY"
+    echo "===== HTTP STATUS ====="
+    echo "$HTTP_STATUS"
 
-          echo "===== SUPABASE RESPONSE ====="
-          echo "$RESPONSE"
+    # try to extract id safely (array or object)
+    if echo "$BODY" | jq -e . >/dev/null 2>&1; then
+      ID=$(echo "$BODY" | jq -r 'if type=="array" then .[0].id else .id end // ""')
+    else
+      ID=""
+    fi
 
-          # 配列でもオブジェクトでも対応
-          ID=$(echo "$RESPONSE" | jq -r 'if type=="array" then .[0].id else .id end')
+    echo "extracted_id=$ID" >> $GITHUB_OUTPUT
 
-          echo "id=$ID" >> $GITHUB_OUTPUT
+    # fail if not 2xx
+    if [[ "$HTTP_STATUS" -lt 200 || "$HTTP_STATUS" -ge 300 ]]; then
+      echo "ERROR: HTTP $HTTP_STATUS returned from Supabase. See body above."
+      exit 1
+    fi
 
-      - name: Delete keepalive record
-        if: steps.insert.outputs.id != ''
-        run: |
-          curl -s -X DELETE \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/keepalive_log?id=eq:${{ steps.insert.outputs.id }}"
+- name: Delete keepalive record (debug)
+  if: steps.insert.outputs.extracted_id != ''
+  run: |
+    set -euo pipefail
+    ID=${{ steps.insert.outputs.extracted_id }}
+    echo "Deleting id=$ID"
+    DELETE_RESP=$(curl -sS -w "\n%{http_code}" -X DELETE \
+      -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+      -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+      "${{ secrets.SUPABASE_URL }}/rest/v1/keepalive_log?id=eq.${ID}" ) || true
 
-      - name: Log when no ID is returned
-        if: steps.insert.outputs.id == ''
-        run: echo "Insert succeeded but no ID was returned. Nothing to delete."
+    DEL_STATUS=$(echo "$DELETE_RESP" | tail -n1)
+    DEL_BODY=$(echo "$DELETE_RESP" | sed '$d')
+
+    echo "===== DELETE BODY ====="
+    echo "$DEL_BODY"
+    echo "===== DELETE STATUS ====="
+    echo "$DEL_STATUS"
+
+    if [[ "$DEL_STATUS" -lt 200 || "$DEL_STATUS" -ge 300 ]]; then
+      echo "ERROR: DELETE returned $DEL_STATUS"
+      exit 1
+    fi
