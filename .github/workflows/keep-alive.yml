@@ -2,7 +2,7 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    - cron: "0 0 * * *" # 毎日 0:00 UTC に実行（日本時間 9:00）
+    - cron: "0 * * * *" # 毎時 0分に実行（1時間ごと）
   workflow_dispatch: # 手動実行も可能
 
 jobs:
@@ -10,10 +10,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Insert keepalive record
+        id: insert
         run: |
-          curl -s -X POST \
+          RESPONSE=$(curl -s -X POST \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
             -H "Content-Type: application/json" \
             -d "{\"note\": \"keepalive from GitHub Actions\"}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/keepalive_log"
+            "${{ secrets.SUPABASE_URL }}/rest/v1/keepalive_log?select=id")
+
+          echo "Response: $RESPONSE"
+
+          # レスポンスからIDを抽出
+          ID=$(echo $RESPONSE | grep -o '"id":[0-9]*' | grep -o '[0-9]*')
+
+          if [ -z "$ID" ]; then
+            echo "Failed to insert record."
+            exit 1
+          fi
+
+          echo "inserted_id=$ID" >> $GITHUB_OUTPUT
+
+      - name: Delete keepalive record
+        run: |
+          curl -s -X DELETE \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/keepalive_log?id=eq.${{ steps.insert.outputs.inserted_id }}"
