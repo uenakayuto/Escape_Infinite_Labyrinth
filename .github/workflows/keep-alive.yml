@@ -16,8 +16,8 @@ jobs:
         id: insert
         run: |
           RESPONSE=$(curl -s -X POST \
-            -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE }}" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
             -H "Content-Type: application/json" \
             -H "Prefer: return=representation" \
             -d "{\"note\": \"keepalive from GitHub Actions\"}" \
@@ -35,8 +35,8 @@ jobs:
         if: steps.insert.outputs.id != ''
         run: |
           curl -s -X DELETE \
-            -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE }}" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
             "${{ secrets.SUPABASE_URL }}/rest/v1/keepalive_log?id=eq:${{ steps.insert.outputs.id }}"
 
       - name: Log when no ID is returned
