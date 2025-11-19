@@ -2,7 +2,7 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    - cron: "0 * * * *" # 毎時
+    - cron: "0 * * * *" # 毎時実行
   workflow_dispatch:
 
 jobs:
@@ -15,7 +15,7 @@ jobs:
       - name: Insert keepalive record
         id: insert
         run: |
-          RESPONSE=$(curl -X POST \
+          RESPONSE=$(curl -s -X POST \
             -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE }}" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE }}" \
             -H "Content-Type: application/json" \
@@ -23,13 +23,22 @@ jobs:
             -d "{\"note\": \"keepalive from GitHub Actions\"}" \
             "${{ secrets.SUPABASE_URL }}/rest/v1/keepalive_log")
 
-          echo "response=$RESPONSE" >> $GITHUB_OUTPUT
-          ID=$(echo "$RESPONSE" | jq -r '.[0].id')
+          echo "===== SUPABASE RESPONSE ====="
+          echo "$RESPONSE"
+
+          # 配列でもオブジェクトでも対応
+          ID=$(echo "$RESPONSE" | jq -r 'if type=="array" then .[0].id else .id end')
+
           echo "id=$ID" >> $GITHUB_OUTPUT
 
       - name: Delete keepalive record
+        if: steps.insert.outputs.id != ''
         run: |
-          curl -X DELETE \
+          curl -s -X DELETE \
             -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE }}" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE }}" \
             "${{ secrets.SUPABASE_URL }}/rest/v1/keepalive_log?id=eq:${{ steps.insert.outputs.id }}"
+
+      - name: Log when no ID is returned
+        if: steps.insert.outputs.id == ''
+        run: echo "Insert succeeded but no ID was returned. Nothing to delete."
