@@ -243,12 +243,12 @@ function handleVolumeChange(e) {
   const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
 
   // BGMスライダー操作
-  if (mouseY >= sliders.bgm.y && mouseY <= sliders.bgm.y + 20) {
+  if (mouseY >= sliders.bgm.y && mouseY <= sliders.bgm.y + 20 && mouseX >= sliders.bgm.x && mouseX <= sliders.bgm.x + sliders.bgm.width) {
     volumes.bgmVolume = Math.min(Math.max((mouseX - sliders.bgm.x) / sliders.bgm.width, 0), 1);
   }
 
   // SEスライダー操作
-  if (mouseY >= sliders.se.y && mouseY <= sliders.se.y + 20) {
+  if (mouseY >= sliders.se.y && mouseY <= sliders.se.y + 20 && mouseX >= sliders.se.x && mouseX <= sliders.se.x + sliders.se.width) {
     volumes.seVolume = Math.min(Math.max((mouseX - sliders.se.x) / sliders.se.width, 0), 1);
   }
 
