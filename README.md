@@ -1,13 +1,13 @@
 # Escape Infinite Labyrinth
 
-## ゲーム URL
+## ゲームURL
 [https://escape-infinite-labyrinth.vercel.app/](https://escape-infinite-labyrinth.vercel.app/)  
 (**PCのみ対応)
 
 ---
 
 ## 概要
-- 植中雄斗の個人開発ゲーム
+- 個人開発Webブラウザゲーム
 - 初版をpygameで開発
 - 初版をJavascriptで書き換え，Webブラウザ版に手動移植
 
